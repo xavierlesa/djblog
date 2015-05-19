@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load getmediacontent markup getdynaform %}
+{% block title %}{{ object.title }}{% endblock %}
+{% block og_meta %}
+    <meta property="og:title" content="{{ object.title }}">
+    <meta property="og:description" content="{% if object.get_first_paragraph %}{{ object.get_first_paragraph.content|fix_ampersands|safe }}{% else %}{{ object.content }}{% endif %}">
+    <meta property="og:image" content="http://{{ site.domain }}{% if object.first_image %}{{ object.first_image.content.url }}{% else %}{{ STATIC_URL }}images/logo_default.png{% endif %}">
+    <meta property="og:url" content="http://{{ site.domain }}{{ object.get_absolute_url }}">
+    <meta property="og:type" content="article">
+{% endblock og_meta %}
+{% block maincontent %}
+<!-- page {{ object.id }} // category {{ category }}-->
+<div class="row">
+    <div class="small-12 columns">
+    {% block post_detail_tools %}{% if user.is_staff %}<a href="{% url admin:djblog_post_change object.pk %}">editar</a>{% endif %}{% endblock %}
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 columns">
+    {% block post_detail_title %}<h1 class="subheader">{{ object.title }}</h1>{% endblock %}
+    </div>
+</div>
+{% block post_detail_body %}
+{% for row in  object.parse_content %}
+<div class="row">
+    {% for paragraph in row %}{% include "djblog/_render.html" with paragraph=paragraph %}{% endfor %}
+</div>
+{% empty %}
+<div class="content">{{ object.content_rendered|safe }}</div>
+{% endfor %}
+{% endblock %}
+
+<div class="row">
+    <div class="small-12 columns">
+        {% with forms=object|get_post_extra_content_key:'dynaform' object=object %}
+        {% for form in forms %}
+		<div class="custom-form">
+        {% dynaform_form form_slug=form.name success_url=form.field as object_form %}{{ object_form }}
+        </div>
+        {% endfor %}
+        {% endwith %}
+    </div>
+</div>
+{% endblock  %}
+
+{% block beforebodyend %}
+{{ block.super }}
+<script src="{{ STATIC_URL }}js/nebula.plugins.js"></script>
+{% endblock %}

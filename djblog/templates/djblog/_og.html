@@ -1,0 +1,29 @@
+{% spaceless %}
+{# meta default #}
+<meta content="{% if object.get_first_paragraph %}{{ object.get_first_paragraph.content|fix_ampersands|truncatewords:30 }}{% else %}{{ object.content }}{% endif %}" data-page-subject="true" name="description" />
+<meta content="{{ object.keywords }}" data-page-subject="true" name="keywords" />
+<meta content="{% now 'Y-m-d H:i:s T' %}" data-page-subject="true" name="date" />
+<meta content="{{ object.get_short_url }}" data-page-subject="true" name="short_url" />
+{# meta og #}
+<meta content="http://{{ site.domain }}{{ object.get_absolute_url }}" data-page-subject="true" property="og:url" />
+<meta content="{{ object.title }}" data-page-subject="true" property="og:title" />
+<meta content="article" data-page-subject="true" property="og:type" />
+<meta content="{{ site.name }}" data-page-subject="true" property="og:site_name" />
+<meta content="{{ object.copete }}" data-page-subject="true" property="og:description" />
+<meta content="{% if object.first_image %}{{ object.first_image.content }}{% else %}{{ STATIC_URL }}images/logo_default.png{% endif %}" data-page-subject="true" property="og:image" />
+<meta content="{{ object.publication_date|date:'c' }}" data-page-subject="true" property="og:article:published_time" />
+<meta content="{{ object.up_date|date:'c' }}" data-page-subject="true" property="og:article:modified_time" />
+<meta content="{{ FACEBOOK_LINK }}" data-page-subject="true" property="og:article:publisher" />
+{# meta twitter #}
+<meta content="{{ object.title }}" data-page-subject="true" name="twitter:title" />
+<meta content="{{ object.copete }}" data-page-subject="true" name="twitter:description" />
+<meta content="{% if object.first_image %}{{ object.first_image.content }}{% else %}{{ STATIC_URL }}images/logo_default.png{% endif %}" data-page-subject="true" name="twitter:image" />
+<meta content="@{{ TWITTER_ID }}" data-page-subject="true" name="twitter:site" />
+<meta content="http://{{ site.domain }}{{ object.get_absolute_url }}" data-page-subject="true" name="twitter:url" />
+<meta content="@{{ TWITTER_ID }}" data-page-subject="true" name="twitter:creator" />
+<meta content="photo" data-page-subject="true" name="twitter:card" />
+<meta content="560" data-page-subject="true" name="twitter:image:width" />
+<meta content="750" data-page-subject="true" name="twitter:image:height" />
+{# meta parsely #}
+<meta name=parsely-page content='{"title":"{{ object.title }}","link":"http://{{ site.domain }}{{ object.get_absolute_url }}","image_url":"{% if object.first_image %}{{ object.first_image.content.url }}{% else %}{{ STATIC_URL }}images/logo_default.png{% endif %}","type":"post","post_id":{{ object.id }},"pub_date":"{{ object.publication_date|date:'c' }}","section":"","author":"{{ object.author }}","tags":[{% for tag in object.tags.all %}"{{ tag.name }}"{% if not forloop.last %},{% endif %}{% endfor %}]}' data-page-subject=true >
+{% endspaceless %}

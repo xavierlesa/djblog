@@ -1,0 +1,24 @@
+<div class="slideshow-wrapper">
+    <div class="preloader"></div>
+    <ul data-orbit data-options="{{ gallery_options|default:'bullets:false;slide_number_class:hide;slide_number: false;' }}">
+    {% for element in paragraph.content %}
+        <li data-orbit-slide="{{ paragraph.id }}-slide-{{ forloop.counter }}">
+            <img src="{{ element.url }}" />
+            <div class="orbit-caption">{{ element.title }}</div>
+        </li>
+    {% endfor %}
+    </ul>
+</div>
+{% if gallery_thumbs %}
+<div class="row gallery-thumbs">
+    <div class="small-12 large-12 columns">
+        <ul class="small-block-grid-6 large-block-grid-6">
+        {% for element in paragraph.content %}
+            <li>
+                <a href="#"  data-orbit-link="{{ paragraph.id }}-slide-{{ forloop.counter }}"><img src="{{ element.url }}" /></a>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}

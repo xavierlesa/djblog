@@ -1,0 +1,5 @@
+requests
+json
+urllib
+
+git+https://github.com/ninjaotoko/django-mediacontent.git

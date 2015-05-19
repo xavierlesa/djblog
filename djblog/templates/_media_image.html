@@ -1,0 +1,1 @@
+<img src="{% if object.content and object.content.url %}{{ object.content.url }}{% elif object.content and object.type == 'img' %}{{ object.content }}{% elif object.content and object.type == 'video:youtube' %}http://img.youtube.com/vi/{{ object.content }}/hqdefault.jpg{% else %}{{ object }}{% endif %}" title="{{ title }}" alt="{{ alt }}"/>

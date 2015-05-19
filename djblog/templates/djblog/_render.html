@@ -1,0 +1,19 @@
+<div class="small-12 {% if paragraph.columns.medium %}medium-{{ paragraph.columns.medium }}{% endif %} {% if paragraph.columns.large %}large-{{ paragraph.columns.large }}{% endif %} columns">
+    {% if paragraph.type == "p" %}
+        {% include 'djblog/_render/paragraph.html' with paragraph=paragraph %}
+    {% elif paragraph.type == "accordion" %}
+        {% include 'djblog/_render/accordion.html' with paragraph=paragraph %}
+    {% elif paragraph.type == "img" %}
+        {% include 'djblog/_render/image.html' with paragraph=paragraph %}
+    {% elif paragraph.type == "video:youtube" %}
+        {% include 'djblog/_render/video/youtube.html' with paragraph=paragraph %}
+    {% elif paragraph.type == "video:vimeo" %}
+        {% include 'djblog/_render/video/vimeo.html' with paragraph=paragraph %}
+    {% elif paragraph.type == "video:channel" %}
+        {% include 'djblog/_render/video/channel.html' with paragraph=paragraph %}
+    {% elif paragraph.type == "gallery" %}
+        {% include 'djblog/_render/gallery.html' with paragraph=paragraph gallery_options=gallery_options %}
+    {% else %}
+        {% include 'djblog/_render/fallback.html' with paragraph=paragraph %}
+    {% endif %}
+</div>
