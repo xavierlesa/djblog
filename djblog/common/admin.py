@@ -27,19 +27,27 @@ class MultiSiteBaseAdmin(admin.ModelAdmin):
     get_site.short_description = u"Sites"
 
     #def formfield_for_manytomany(self, db_field, request, **kwargs):
-    #    logger.debug(db_field)
+    #    try:
+    #        qs = db_field.rel.related_model.objects_for_admin
+    #    except:
+    #        logger.debug("Error objects_for_admin no existe en el field %s", db_field)
+    #        pass
+    #    else:
+    #        kwargs["queryset"] = qs.all()
+    #        logger.debug("QuerySet para el field %s", db_field)
 
-    #    model_instance = db_field.related.parent_model
-    #    if issubclass(model_instance, MultiSiteBaseModel):
-    #        kwargs["queryset"] = model_instance.objects_for_admin.all()
     #    return super(MultiSiteBaseAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
     #
     #def formfield_for_foreignkey(self, db_field, request, **kwargs):
-    #    logger.debug(db_field)
+    #    try:
+    #        qs = db_field.rel.related_model.objects_for_admin
+    #    except:
+    #        logger.debug("Error objects_for_admin no existe en el field %s", db_field)
+    #        pass
+    #    else:
+    #        kwargs["queryset"] = qs.all()
+    #        logger.debug("QuerySet para el field %s", db_field)
 
-    #    model_instance = db_field.related.parent_model
-    #    if issubclass(model_instance, MultiSiteBaseModel):
-    #        kwargs["queryset"] = model_instance.objects_for_admin.all()
     #    return super(MultiSiteBaseAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
