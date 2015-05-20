@@ -15,7 +15,7 @@ class SiteBlogManager(MultiSiteBaseManager):
     active: son los objetos que puede ser visibles en el front.
     """
     def live(self, *args, **kwargs):
-        return self.get_query_set(*args, **kwargs).filter(is_live=True)
+        return self.get_queryset(*args, **kwargs).filter(is_live=True)
 
     def active(self, *args, **kwargs):
         return self.live(*args, **kwargs).filter(is_active=True)
@@ -28,7 +28,7 @@ class BlogManager(MultiSiteBaseManager):
     active: son los objetos que puede ser visibles en el front.
     """
     def live_no_lang(self, *args, **kwargs):
-        return self.get_query_set(*args, **kwargs).filter(is_live=True)
+        return self.get_queryset(*args, **kwargs).filter(is_live=True)
 
     def live(self, *args, **kwargs):
         return self.get_for_lang(*args, **kwargs).filter(is_live=True)

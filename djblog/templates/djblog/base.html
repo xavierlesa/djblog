@@ -1,53 +1,12 @@
 {% extends 'base.html' %}
+{% comment %}
+Desde aqui se debe extener para los diferentes contenidos de djblog
+{% endcomment %}
 
-{% block title %}{% if category %}{{ category }}{% else %}{{ block.super }} / Blog{% endif %}{% endblock %}
+{% block title %}{% if category %}{{ category }}{% else %}{{ block.super }}{% endif %}{% endblock %}
 
-{% block content %}
-<!-- blog -->
-<div>
-    <h2 class="bdb bw1 bss bdc2">blog</h2>
-    <ul>
-        {% get_blog_categories as category_list %}
-        {% for item in category_list %}
-        {% include 'widgets/navbar_item.html' %}
-        {% endfor %}
-    </ul>
-
-    {% block post_list %}
-
-    {% get_latest_blog_posts as object_list %}
-    {% for object in object_list|slice:'5' %}
-    <article>
-        <h3>{{ object.title }}</h3>
-        {% if object.first_content.gallery %}
-        <div class="fl ma10r ma10b"><img src="{{ object.first_content.gallery.url }}" /></div>
-        {{ object.preview_content }}
-        {% else %}{% if object.first_content.field_json %}
-        {% with object.first_content.field_json as object %}{% include 'widgets/media_render_embed.html' %}{% endwith %}
-        {{ object.preview_content|striptags }}
-        {% else %}
-        {{ object.preview_content }}
-        {% endif %}{% endif %}
-        <p class="tr cl"><a href="{{ object.get_absolute_url }}">continuar leyendo</a></p>
-        <p class="tags ma10v">tags:{% for tag in object.tags.all %}<span>{{ tag }}</span> | {% endfor %}</p>
-    </article>
-    {% endfor %}
-    <div class="comments">
-        <div class="user">
-            <img src="{{ MEDIA_URL }}media/img/no_user.gif" />
-        </div>
-        <div class="text">
-            <textarea class="edit"></textarea>
-        </div>
-        <div class="action">
-            <input type="submit" />
-        </div>
-        <div class="preview"></div>
-        <script>$(function(){ makeeditor( $(".edit"), $(".preview") ) });</script>
-    </div>
-
-    {% endblock post_list %}
-</div>
-<!-- /blog -->
-
-{% endblock content %}
+{% block main %}
+<main>    
+    {% block maincontent %}{% endblock %}
+</main>
+{% endblock %}

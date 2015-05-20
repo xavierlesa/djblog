@@ -1,33 +1,28 @@
-{% extends 'base.html' %}
-{% load getmediacontent %}
-{% block content %}
+{% extends 'djblog/base.html' %}
+{% load djblog_tags mediacontent_tags %}
+{% block maincontent %}
+<!-- pages {{ object_list.count }} // category {{ category }}-->
 <div class="row">
-    <div class="eleven columns centered">
+    <div class="small-12 columns">
         {% for object in object_list %}
         <div class="row">
-            {% if user.is_staff %} <a href="{% url admin:djblog_post_change object.pk %}">editar</a>{% endif %}
-            <div class="twelve columns"><a href="{{ object.get_absolute_url }}"><h3>{{ object.title }}</h3></a></div>
-            {% if object.first_image %}
-            {% with size=object.first_image.content.path|get_image_size template_config=object|get_post_extra_content_key_name:'template,content_column' %}
-            {% if size.0 > 470 %}
-            <div class="twelve columns"><a href="{{ object.get_absolute_url }}" class="th"><img src="{{ object.first_image.content.url }}" /></a></div>
-            <div class="twelve columns content">{{ object.content_rendered|truncatewords_html:"100"|safe }} <a href="{{ object.get_absolute_url }}" class="success label radius">Ver más</a></div>
-            {% elif size.0 <= 470 and size.0 > 313 %}
-            <div class="six columns content {% if template_config.0.field == 'right' %}push-six{% endif %}">{{ object.content_rendered|safe }}</div>
-            <div class="six columns {% if template_config.0.field == 'right' %}pull-six{% endif %}"><a href="{{ object.get_absolute_url }}" class="th"><img src="{{ object.first_image.content.url }}" /></a></div>
-            {% elif size.0 <= 313 %}
-            <div class="eight columns content {% if template_config.0.field == 'right' %}push-four{% endif %}">{{ object.content_rendered|safe }}</div>
-            <div class="four columns {% if template_config.0.field == 'right' %}pull-eight{% endif %}"><a href="{{ object.get_absolute_url }}" class="th"><img src="{{ object.first_image.content.url }}" /></a></div>
-            {% endif %}
-            {% endwith %}
-            {% else %}
-            <div class="three columns"><a href="{{ object.get_absolute_url }}" class="th"><img src="{{ STATIC_URL }}images/tips.jpg" /></a></div>
-            <div class="nine columns content">{{ object.content_rendered|truncatewords_html:"100"|safe }} <a href="{{ object.get_absolute_url }}" class="success label radius">Ver más</a></div>
-            {% endif %}
+            <div class="small-12 columns">
+                <a href="{{ object.get_absolute_url }}">
+                    <h3>{% post_title %}</h3>
+                </a>
+            </div>
+            <div class="small-12 columns">
+                <a href="{{ object.get_absolute_url }}">
+                    {% post_image %}
+                </a>
+            </div>
+            <div class="small-12 columns">
+                {% post_extract tag_link='<a href="%s">Leer más</a>' %}
+            </div>
         </div>
         <hr>
         {% endfor  %}
     </div>
 </div>
-{% include '_paginator.html' %}
+{% include 'djblog/includes/paginator.html' %}
 {% endblock  %}

@@ -3,6 +3,7 @@
 Una app para hacer un simple blog, con posts, páginas y blocks
 
 """
+import collections
 
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -27,7 +28,6 @@ from mediacontent.models import MediaContent
 from djblog.content_extra.models import ExtraContent, ContentType
 from djblog.managers import TagManager, CategoryManager, PostManager
 from djblog.common.models import BaseModel, ContentModel, CategoryModel
-#from djblog.common.utils import convert_to_localtime
 
 DJBLOG_PREVIEW_CONTENT_SIZE = getattr(settings, 'DJBLOG_PREVIEW_CONTENT_SIZE', 45)
 DJBLOG_CONTENT_FORMAT = getattr(settings, 'DJBLOG_CONTENT_FORMAT', 'html') # plain = plano, html
@@ -166,7 +166,8 @@ class Post(BaseModel, ContentModel):
             verbose_name=_(u"Cerrar automáticamente"))
 
     template_name = models.CharField(max_length=200, blank=True, null=True, 
-            help_text=_(u"Define un template para este objeto (post o página). path/al/template(nombre_template.html"))
+            help_text=_(u"Define un template para este objeto (post o página). \
+                    path/al/template(nombre_template.html"))
 
     custom_template = models.TextField(verbose_name=_(u"Template HTML/Daango"), 
             blank=True, null=True)
@@ -278,6 +279,10 @@ class Post(BaseModel, ContentModel):
 
     def get_first_paragraph(self):
         parsed_content = self.parse_content()
+
+        if not isinstance(parsed_content, collections.Iterable):
+            return ""
+
         for row in parsed_content:
             for obj in row:
                 if obj['type'] == 'p':
@@ -296,6 +301,10 @@ class Post(BaseModel, ContentModel):
             return images[0]
 
         parsed_content = self.parse_content()
+        
+        if not isinstance(parsed_content, collections.Iterable):
+            return ""
+
         if parsed_content:
             for row in parsed_content:
                 for obj in row:
@@ -303,3 +312,10 @@ class Post(BaseModel, ContentModel):
                         return obj
         return ''
     first_image = property(get_first_image)
+
+    def get_template(self):
+        """
+        Resuelve el template a utilizar para el render
+
+        """
+        pass

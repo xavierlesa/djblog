@@ -1,0 +1,26 @@
+<ul class="pagination">
+    <li class="arrow {% if not page_obj.has_previous %}unavailable{% endif %}"><a href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% endif %}">&laquo;</a></li>
+    {% for p in paginator.page_range %}
+    {% if forloop.first %}
+    <li class="{% if page_obj.number == p %}current {% endif %}"><a href="?page={{ p }}{% if query %}&q={{ query }}{% endif %}">{{ p }}</a></li>
+    {% else %}
+    {% if forloop.last %}
+    <li class="{% if page_obj.number == p %}current {% endif %}{% if forloop.last %}last{% endif %}"><a class="btn" href="?page={{ p }}{% if query %}&q={{ query}}{% endif %}">{{ p }}</a></li>
+    {% else %}
+    {% if page_obj.number <= p|add:'5' and p <= page_obj.number %}
+    <li class="{% if page_obj.number == p %}current {% endif %}{% if forloop.last %}last{% endif %}"><a class="btn" href="?page={{ p }}{% if query %}&q={{ query}}{% endif %}">{{ p }}</a></li>
+    {% else %}
+        {% if page_obj.number >= p|add:'-5' and p >= page_obj.number %}
+        <li class="{% if page_obj.number == p %}current {% endif %}{% if forloop.last %}last{% endif %}"><a class="btn" href="?page={{ p }}{% if query %}&q={{ query}}{% endif %}">{{ p }}</a></li>
+        {% else %}
+            {% if p|divisibleby:'5' %}
+            <li>&hellip;</li>
+            <li class="{% if page_obj.number == p %}current {% endif %}{% if forloop.last %}last{% endif %}"><a class="btn" href="?page={{ p }}{% if query %}&q={{ query}}{% endif %}">{{ p }}</a></li>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+    {% endif %}
+    {% endif %}
+    {% endfor %}
+    <li class="arrow {% if not page_obj.has_next %}unavailable{% endif %}"><a href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% endif %}">&raquo;</a></li>
+</ul>

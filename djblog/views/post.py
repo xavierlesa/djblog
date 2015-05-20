@@ -366,17 +366,3 @@ class PostDetailView(PostBase, DetailView):
         templates.extend(names)
         logger.debug('Loading theses templates names %s' % templates)
         return templates
-
-
-#
-# Haystack View
-#
-
-if 'haystack' in getattr(settings, 'INSTALLED_APPS', []):
-    from haystack.views import SearchView
-    from haystack.query import SearchQuerySet
-
-    class CustomSearchView(SearchView):
-        def __init__(self, *args, **kwargs):
-            super(CustomSearchView, self).__init__(*args, **kwargs)
-            self.searchqueryset = SearchQuerySet().models(Post).filter(is_page=0)

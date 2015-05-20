@@ -189,10 +189,9 @@ class ContentModel(models.Model):
     comentarios (con títulos), preguntas/prespuestas y todo lo que incluya un título y una descripción.
     """
     title = models.CharField(max_length=200, verbose_name=_(u"Título"))
-    copete = models.CharField(max_length=200, blank=True, verbose_name=_(u"Copete"))
-    content = models.TextField(verbose_name=_(u"Contenido en texto plano"), help_text=_(u"Se puede utilizar # para incluir como \
-            tag o referencia a un objeto y @ para usuarios"))
-    content_rendered = models.TextField(verbose_name=_(u"Contenido"), help_text=_(u"permite marcado"))
+    copete = models.TextField(verbose_name=_(u"Copete"), help_text=_(u"Es opcional, y si exsite se usa para el extracto"), blank=True)
+    content = models.TextField(verbose_name=_(u"Contenido en texto plano"))
+    content_rendered = models.TextField(verbose_name=_(u"Contenido HTML"), help_text=_(u"Este es el contenido a mostrarse, permite marcado"))
 
     objects = BaseManager()
 

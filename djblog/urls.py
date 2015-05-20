@@ -15,6 +15,8 @@ urlpatterns = patterns('',
 
 # Haystack config
 if 'haystack' in getattr(settings, 'INSTALLED_APPS', []):
+    from djblog.views.search import *
+
     urlpatterns += patterns('',
         url(r'^buscar/', CustomSearchView(), name="haystack_search"),
     )

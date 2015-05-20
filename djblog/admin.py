@@ -15,16 +15,42 @@ from djblog.models import Post, Category, Status, Tag
 from djblog.content_extra.admin import ExtraContentInline
 from djblog.common.admin import BaseAdmin
 
-NEBULA_FLAGS = getattr(settings, 'NEBULA_FLAGS', {})
-
 class PostAdmin(BaseAdmin):
-    list_display = ('get_category', 'title', 'status', 'author', 'get_publication_date', 'get_expiration_date', 'get_is_active', 'get_is_page', 'get_site')
-    list_display_links = ('title',)
-    list_filter = ('category', 'author', 'is_page').__add__(BaseAdmin.list_filter)
-    search_fields = ['title', 'copete', 'content']
+    list_display = (
+            'get_category', 
+            'title', 
+            'status', 
+            'author', 
+            'get_publication_date', 
+            'get_expiration_date', 
+            'get_is_active', 
+            'get_is_page', 
+            'get_site'
+        )
+
+    list_display_links = (
+            'title',
+        )
+
+    list_filter = (
+            'category', 
+            'author', 
+            'is_page'
+        ).__add__(BaseAdmin.list_filter)
+
+    search_fields = [
+            'title', 
+            'copete', 
+            'content'
+        ]
+
     #form = PostAdminForm
+    
     inlines = [MediaContentInline, ExtraContentInline]
-    prepopulated_fields = {'slug': ('title',),}
+    
+    prepopulated_fields = {
+            'slug': ('title',),
+        }
 
     # solo mostrar los objetos del usuario, o todo si es superuser
     def queryset(self, request):
@@ -46,26 +72,75 @@ class PostAdmin(BaseAdmin):
 
     def add_view(self, request, form_url='', extra_context={}):
         self.fieldsets = (
-            (None, {'fields': ('title', 'slug', 'copete', 'content_rendered', 'category', 'site', ('is_page', 'status', 'author'))}),
+            (None, {
+                'fields': (
+                    'title', 
+                    'slug', 
+                    'copete', 
+                    'content_rendered', 
+                    'category', 
+                    'site', 
+                    (
+                        'is_page', 
+                        'status', 
+                        'author'
+                    )
+                )
+            }),
         )
         return super(PostAdmin, self).add_view(request, form_url, extra_context)
 
     def change_view(self, request, object_id, extra_context={}):
         self.fieldsets = (
-            (None, {'fields': ('title', 'slug', 'copete', 'content_rendered', 'category', 'site', ('is_page', 'status', 'author'))}),
+            (None, {
+                'fields': (
+                    'title', 
+                    'slug', 
+                    'copete', 
+                    'content_rendered', 
+                    'category', 
+                    'site', 
+                    (
+                        'is_page', 
+                        'status', 
+                        'author'
+                    )
+                )
+            }),
             ('Comments', {
-                'fields': ('allow_comments', 'comments_finish_date'),
-                'classes': ('collapse',)
+                'fields': (
+                    'allow_comments', 
+                    'comments_finish_date'
+                ),
+                'classes': (
+                    'collapse',
+                )
             }),
             ('Scheduling', {
-                'fields': (('publication_date', 'expiration_date'),),
-                'classes': ('collapse',)
+                'fields': (
+                    (
+                        'publication_date', 
+                        'expiration_date'
+                    ),
+                ),
+                'classes': (
+                    'collapse',
+                )
             }),
             ('Relationships', {
-                'fields': (('followup_for', 'related'), 'tags'),
-                'classes': ('collapse',)
+                'fields': (
+                    (
+                        'followup_for', 
+                        'related'
+                    ), 
+                    'tags'
+                ),
+                'classes': (
+                    'collapse',
+                )
             }),
         ).__add__(BaseAdmin.fieldsets)
+
         return super(PostAdmin, self).change_view(request, object_id, extra_context=extra_context)
 
 
@@ -115,22 +190,47 @@ class PostAdmin(BaseAdmin):
 
 
 class CategoryAdmin(BaseAdmin):
-    list_display = ('name', 'parent', 'level', 'get_blog_category', 'get_is_active', 'get_site')
-    list_filter = ('level','blog_category','site',).__add__(BaseAdmin.list_filter)
-    prepopulated_fields = {'slug': ('name',)} 
-    _main_fields = (None, {'fields': ('name', 'slug', 'parent', 'site')})
-    if NEBULA_FLAGS.get('BLOG_CATEGORY_DESCRIPTION', False):
-        _main_fields = (None, {'fields': ('name', 'slug', 'description', 'parent', 'site')})
-    if NEBULA_FLAGS.get('BLOG_CATEGORY_SHOW_LIST', False):
-        _main_fields[1]['fields'] = _main_fields[1]['fields'] + ('show_on_list', )
+    list_display = (
+            'name', 
+            'parent', 
+            'level', 
+            'get_blog_category', 
+            'get_is_active', 
+            'get_site'
+        )
+
+    list_filter = (
+            'level',
+            'blog_category',
+            'site'
+        ).__add__(BaseAdmin.list_filter)
+
+    prepopulated_fields = {
+            'slug': (
+                'name',
+            )
+        } 
 
     fieldsets = (
-        _main_fields,
-        ('Advanced', {
-            'fields': ('blog_category', 'level'),
-            'classes': ('collapse',)
+        (None, {
+            'fields': (
+                'name', 
+                'slug', 
+                'show_on_list', 
+                'parent', 
+                'description', 
+                'site'
+            )
         }),
-
+        ('Advanced', {
+            'fields': (
+                'blog_category', 
+                'level'
+            ),
+            'classes': (
+                'collapse',
+            )
+        }),
     ).__add__(BaseAdmin.fieldsets)
 
     def get_blog_category(self, obj):
@@ -156,13 +256,30 @@ class StatusAdmin(admin.ModelAdmin):
 
 
 class TagAdmin(BaseAdmin):
-    list_display = ('name', 'get_is_active', 'get_site',)
-    list_filter = ('is_active', 'site',)
-    prepopulated_fields = {'slug': ('name',)}
-    fieldsets = (
-        (None, {'fields': ('name', 'slug')}),
-    ).__add__(BaseAdmin.fieldsets)
+    list_display = (
+            'name', 
+            'get_is_active', 
+            'get_site',
+        )
 
+    list_filter = (
+            'is_active', 
+            'site',
+        )
+
+    prepopulated_fields = {
+            'slug': (
+                'name',
+            )}
+
+    fieldsets = (
+        (None, {
+            'fields': (
+                'name', 
+                'slug'
+                )
+            }),
+        ).__add__(BaseAdmin.fieldsets)
 
 
 admin.site.register(Post, PostAdmin)

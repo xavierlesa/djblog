@@ -2,28 +2,22 @@
 
 from django.db.models import Q, F
 from django.db.models.query import QuerySet
-from django import template
+from django.template import Template, loader
 from django.conf import settings
-from django.contrib.sites.models import Site
-from django.template.defaultfilters import striptags
-from markdown import markdown
+from django.utils.safestring import mark_safe
+from django.template.defaultfilters import slugify, striptags, truncatewords, \
+        truncatechars, force_escape, escape, date
 
-from djblog.models import Post, Tag, Category
-
+from django import template
 register = template.Library()
 
-################################################################################
-# tags new style
-################################################################################
-from django.utils.safestring import mark_safe
-from django.template.defaultfilters import slugify, striptags, truncatewords, truncatechars, force_escape, escape, date
 
 import logging
 logger = logging.getLogger(__name__)
 
 import django
-DJANGO_VERSION = [i for i in django.get_version().split('.')]
 
+DJANGO_VERSION = [i for i in django.get_version().split('.')]
 if DJANGO_VERSION <= [1,4,5]:
     try:
         from django.template import add_to_builtins
@@ -33,6 +27,10 @@ if DJANGO_VERSION <= [1,4,5]:
 else:
     logger.warning("Esta version de django (%s) no acepta add_to_builtins, `getblog` debe cargarse a manopla", django.get_version())
 
+from markdown import markdown
+from mediacontent.models import MediaContent
+from PIL import Image, ImageOps
+from djblog.models import Post, Tag, Category
 
 # get title for post
 @register.simple_tag(takes_context=True)
@@ -46,9 +44,15 @@ def post_title(context, *args, **kwargs):
     Es posible limitar la cantidad de caracteres pasando el argumento limit.
     """
     obj = context['object']
+    title = obj.title
+
+    if not obj.status or not obj.status.is_public:
+        title = "[DRAFT] %s" % title
+
     if kwargs.get('limit'):
-        return obj.title[:kwargs['limit']]
-    return obj.title
+        title = title[:kwargs['limit']]
+
+    return title
 
 # get first image for post
 @register.simple_tag(takes_context=True)
@@ -56,13 +60,13 @@ def post_image(context, *args, **kwargs):
     """
     Devuelve la imagen principal asociada al post/page
     {% post_image [size=[320x200|thumbnail|gallery] attrs="class='thumb'"] %}
+
     No tiene ningún argumento obligatorio, pero si es posible modificar el 
     tamaño y los atributos del tag.
     size: thumbnail y gallery son valores predefinidos pero sino puede ser 
     seteado con width x height, así 320x200.
     attrs: Son pasados cómo vienen al tag <img src=... %(attrs)s/>
     """
-    from mediacontent.models import MediaContent
     obj = context['object']
     fallback = "%s%s" % (settings.STATIC_URL, kwargs.get('placeholder')) if kwargs.has_key('placeholder') else ''
 
@@ -103,7 +107,6 @@ def post_image(context, *args, **kwargs):
             with open(crop_path):
                 pass
         except IOError:
-            from PIL import Image, ImageOps
             try:
                 image = Image.open(img.content.path)
                 thumb = ImageOps.fit(image, [int(x) for x in size.split('x')], 0, Image.ANTIALIAS, (0.5, 0.0))
@@ -132,33 +135,42 @@ def post_image(context, *args, **kwargs):
 
 # the extract
 @register.simple_tag(takes_context=True)
-def post_extract(context, *args, **kwargs):
+def post_extract(context, splitter='<!--more-->', tag_link='<a href="%s">Leer más</a>', 
+        limit=0, limit_chars=0, is_markdown=False, is_safe=False, *args, **kwargs):
     """
-    Genera el extracto a partir del contenido.
+    Genera el extracto a partir del copete o el contenido.
     {% post_extract %}
     Por defecto post_extract resuelve el object desde el contexto, pero es 
     posible pasar uno desde los argumentos.
     {% post_extract object=post [limit=40 [limit_chars=200]] %}
     Por defecto limita a 30 palabras, pero es posible pasar los argumentos limit 
-    o limir_chars para controlar los límites.
+    o limit_chars para controlar los límites.
     """
     obj = context['object']
-    limit = kwargs.get('limit', 30)
-    limit_chars = kwargs.get('limit_chars', 0)
+
     if not obj:
         return ''
 
-    data = obj.first_paragraph['content'] if obj.first_paragraph else obj.content
+    if obj.copete:
+        data = obj.copete
+    elif obj.first_paragraph and obj.first_paragraph.get('content'):
+        data = obj.first_paragraph['content']
+    else:
+        data = obj.content
 
-    if kwargs.get('markdown', False):
+    if is_markdown:
         data = markdown(data)
 
-    if not kwargs.get('safe', False):
+    if not is_safe:
         data = striptags(data)
 
     if limit_chars:
         return truncatechars(data, limit_chars)
-    return truncatewords(data, limit)
+    elif limit:
+        return truncatewords(data, limit)
+
+    return "%s %s" % (extract(data, splitter)[0], tag_link % obj.get_absolute_url())
+
 
 # date of post
 @register.simple_tag(takes_context=True)
@@ -166,7 +178,7 @@ def post_date(context, *args, **kwargs):
     """
     Retorna la fecha el post/page publication_date.
     {% post_date [format="l j, F"] %}
-    User los siguientes formatos https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
+    Usar los siguientes formatos https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
     """
     obj = context['object']
     date_format = kwargs.get('format', "l j, F")
@@ -175,14 +187,31 @@ def post_date(context, *args, **kwargs):
 
 # the content
 @register.simple_tag(takes_context=True)
-def post_content(context, *args, **kwargs):
+def post_content(context, is_markdown=False, *args, **kwargs):
     """
     Retorna el contenido renderizado del post/page content_render
     {% post_content %}
     """
     obj = context['object']
-    content = obj.content_rendered
-    return mark_safe(content)
+    content = obj.parse_content()
+
+    if not content:
+        content = obj.content_rendered
+
+    default_template = ["djblog/tag/post_content.html"]
+
+    if obj.custom_template:
+        tpl = Template(obj.custom_template)
+
+    elif obj.template_name:
+        default_template.push(obj.template_name)
+        tpl = loader.select_template(default_template)
+
+    else:
+        tpl = loader.select_template(default_template)
+
+    context.update({'content': mark_safe(markdown(content))})
+    return mark_safe(tpl.render(context))
 
 
 # the archive
@@ -427,3 +456,5 @@ def has_category(obj, cat):
 @register.filter
 def exclude_object(qs, obj):
     return qs.exclude(pk=obj.pk)
+
+

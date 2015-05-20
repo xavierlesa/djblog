@@ -15,27 +15,32 @@ from django.conf import settings
 from django.http import HttpResponse
 from djblog.common.models import MultiSiteBaseModel
 
+import logging
+logger = logging.getLogger(__name__)
 
 class MultiSiteBaseAdmin(admin.ModelAdmin):
     def queryset(self, request):
-        return self.model.objects_for_admin.get_query_set()
+        return self.model.objects_for_admin.get_queryset()
 
     def get_site(self, obj):
         return u", ".join([s.name for s in obj.site.all()])
     get_site.short_description = u"Sites"
 
-    def formfield_for_manytomany(self, db_field, request, **kwargs):
-        model_instance = db_field.related.parent_model
-        if issubclass(model_instance, MultiSiteBaseModel):
-            kwargs["queryset"] = model_instance.objects_for_admin.all()
-        return super(MultiSiteBaseAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
-    
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        model_instance = db_field.related.parent_model
-        print model_instance
-        if issubclass(model_instance, MultiSiteBaseModel):
-            kwargs["queryset"] = model_instance.objects_for_admin.all()
-        return super(MultiSiteBaseAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+    #def formfield_for_manytomany(self, db_field, request, **kwargs):
+    #    logger.debug(db_field)
+
+    #    model_instance = db_field.related.parent_model
+    #    if issubclass(model_instance, MultiSiteBaseModel):
+    #        kwargs["queryset"] = model_instance.objects_for_admin.all()
+    #    return super(MultiSiteBaseAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+    #
+    #def formfield_for_foreignkey(self, db_field, request, **kwargs):
+    #    logger.debug(db_field)
+
+    #    model_instance = db_field.related.parent_model
+    #    if issubclass(model_instance, MultiSiteBaseModel):
+    #        kwargs["queryset"] = model_instance.objects_for_admin.all()
+    #    return super(MultiSiteBaseAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 class BaseAdmin(MultiSiteBaseAdmin):
