@@ -9,11 +9,11 @@ from django.template.defaultfilters import timesince, timeuntil
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from nebula.djblog.models import Post, Category, Status, Tag
-from nebula.djblog.forms import PostAdminForm
-from nebula.mediacontent.admin import MediaContentInline
-from nebula.djblog.content_extra.admin import ExtraContentInline
-from nebula.common.admin import BaseAdmin
+from mediacontent.admin import MediaContentInline
+from djblog.models import Post, Category, Status, Tag
+#from djblog.forms import PostAdminForm
+from djblog.content_extra.admin import ExtraContentInline
+from djblog.common.admin import BaseAdmin
 
 NEBULA_FLAGS = getattr(settings, 'NEBULA_FLAGS', {})
 
@@ -22,7 +22,7 @@ class PostAdmin(BaseAdmin):
     list_display_links = ('title',)
     list_filter = ('category', 'author', 'is_page').__add__(BaseAdmin.list_filter)
     search_fields = ['title', 'copete', 'content']
-    form = PostAdminForm
+    #form = PostAdminForm
     inlines = [MediaContentInline, ExtraContentInline]
     prepopulated_fields = {'slug': ('title',),}
 

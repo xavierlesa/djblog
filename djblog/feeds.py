@@ -14,7 +14,7 @@ from django.utils.safestring import mark_safe
 from django.shortcuts import get_object_or_404
 from django.template.defaultfilters import slugify, striptags, truncatewords, \
         truncatewords_html, force_escape, escape, linebreaksbr, urlize
-from nebula.djblog.models import Post, Tag
+from djblog.models import Post, Tag
 #from django.template.defaultfilters import markup
 
 SITE = Site.objects.get_current()

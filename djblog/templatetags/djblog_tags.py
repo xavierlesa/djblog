@@ -8,7 +8,7 @@ from django.contrib.sites.models import Site
 from django.template.defaultfilters import striptags
 from markdown import markdown
 
-from nebula.djblog.models import Post, Tag, Category
+from djblog.models import Post, Tag, Category
 
 register = template.Library()
 
@@ -17,6 +17,22 @@ register = template.Library()
 ################################################################################
 from django.utils.safestring import mark_safe
 from django.template.defaultfilters import slugify, striptags, truncatewords, truncatechars, force_escape, escape, date
+
+import logging
+logger = logging.getLogger(__name__)
+
+import django
+DJANGO_VERSION = [i for i in django.get_version().split('.')]
+
+if DJANGO_VERSION <= [1,4,5]:
+    try:
+        from django.template import add_to_builtins
+        add_to_builtins('djblog.templatetags.getblog')
+    except ImportError:
+        logger.warning("Esta version de django (%s) no acepta add_to_builtins", django.get_version())
+else:
+    logger.warning("Esta version de django (%s) no acepta add_to_builtins, `getblog` debe cargarse a manopla", django.get_version())
+
 
 # get title for post
 @register.simple_tag(takes_context=True)
@@ -46,7 +62,7 @@ def post_image(context, *args, **kwargs):
     seteado con width x height, así 320x200.
     attrs: Son pasados cómo vienen al tag <img src=... %(attrs)s/>
     """
-    from nebula.mediacontent.models import MediaContent
+    from mediacontent.models import MediaContent
     obj = context['object']
     fallback = "%s%s" % (settings.STATIC_URL, kwargs.get('placeholder')) if kwargs.has_key('placeholder') else ''
 

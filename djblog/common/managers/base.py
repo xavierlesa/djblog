@@ -40,9 +40,10 @@ class MultiSiteBaseManager(models.Manager):
 
 
 class MultiSiteBaseManagerAdmin(models.Manager):
-    def get_query_set(self, *args, **kwargs):
-        """ todos los registros de todos los sites """
-        return super(MultiSiteBaseManagerAdmin, self).get_query_set(*args, **kwargs)
+    pass
+    #def get_query_set(self, *args, **kwargs):
+    #    """ todos los registros de todos los sites """
+    #    return super(MultiSiteBaseManagerAdmin, self).get_query_set(*args, **kwargs)
  
 
 class BaseManager(models.Manager):

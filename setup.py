@@ -5,7 +5,7 @@
 # Distributed under the BSD license, see LICENSE
 from setuptools import setup, find_packages
 import sys, os
-from tagembed import version
+from djblog import version
 
 setup(name='djblog', 
         version=version, 

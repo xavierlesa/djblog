@@ -22,12 +22,12 @@ from django.utils.safestring import mark_safe
 from django.utils.encoding import force_unicode
 from django.utils.timezone import now as tz_now, get_current_timezone, utc
 
-from nebula.mediacontent.models import MediaContent
+from mediacontent.models import MediaContent
 
 from djblog.content_extra.models import ExtraContent, ContentType
 from djblog.managers import TagManager, CategoryManager, PostManager
 from djblog.common.models import BaseModel, ContentModel, CategoryModel
-from djblog.common.utils import convert_to_localtime
+#from djblog.common.utils import convert_to_localtime
 
 DJBLOG_PREVIEW_CONTENT_SIZE = getattr(settings, 'DJBLOG_PREVIEW_CONTENT_SIZE', 45)
 DJBLOG_CONTENT_FORMAT = getattr(settings, 'DJBLOG_CONTENT_FORMAT', 'html') # plain = plano, html
@@ -75,7 +75,7 @@ class Status(models.Model):
 class Category(BaseModel, CategoryModel):
     blog_category = models.BooleanField(default=True, blank=True)
     description = models.TextField(blank=True, null=True)
-    show_on_list = models.BooleanField(default=True, null=True)
+    show_on_list = models.BooleanField(default=False)
     objects = CategoryManager()
 
     def __unicode__(self):
@@ -131,6 +131,11 @@ class Category(BaseModel, CategoryModel):
 
 
 class Post(BaseModel, ContentModel):
+    """
+    Post o Página
+
+    title, copete, content, content_rendered
+    """
     is_page = models.BooleanField(default=False, blank=True, 
             choices=(
                 (False, u"Post"),
@@ -143,8 +148,8 @@ class Post(BaseModel, ContentModel):
             verbose_name=_(u"Fecha de vencimiento"))
 
     category = models.ManyToManyField(Category, blank=True, null=True)
-    user = models.ForeignKey(User)
-    author = models.ForeignKey(User, related_name='author')
+    user = models.ForeignKey(User, blank=True, null=True)
+    author = models.ForeignKey(User, related_name='author', blank=True, null=True)
     status = models.ForeignKey(Status, blank=True, null=True)
 
     tags = models.ManyToManyField(Tag, blank=True, help_text=_(u"Tags descriptívos"))
@@ -193,7 +198,7 @@ class Post(BaseModel, ContentModel):
             return (u'page_detail', (self.slug,))
 
         if DJBLOG_DEFAULT_POST_URL_NAME == 'post_detail':
-            pub_date = convert_to_localtime(self.publication_date).strftime('%Y %m %d').split()
+            pub_date = self.publication_date.strftime('%Y %m %d').split()
             pub_date.append(self.slug)
             return ('post_detail', pub_date)
 

@@ -1,7 +1,7 @@
 from django import forms
 from django.db import models
 from django.contrib.contenttypes import generic
-from nebula.djblog.content_extra.models import ExtraContent
+from djblog.content_extra.models import ExtraContent
 
 
 class ExtraContentInline(generic.GenericStackedInline):

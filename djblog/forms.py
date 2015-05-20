@@ -4,14 +4,13 @@ from django.conf import settings
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import slugify
-from nebula.djblog.models import Post, Category
-
 from django.forms.widgets import flatatt
 from django.utils.encoding import smart_unicode, force_unicode
 from django.template.loader import render_to_string
 from django.utils.html import escape, conditional_escape
 from django.utils.safestring import mark_safe
 
+from djblog.models import Post, Category
 
 class PreviewContentWidget(forms.Textarea):
     def render(self, name, value, attrs=None):
@@ -48,3 +47,4 @@ class PostAdminForm(forms.ModelForm):
 
     class Meta:
         model = Post
+        exclude = []

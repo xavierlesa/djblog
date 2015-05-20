@@ -8,7 +8,6 @@ from django.http import Http404, HttpResponseForbidden
 from django.contrib.sites.models import Site
 from django.views.generic import *
 
-from nebula.dynaform.views import DynaformMixin
 
 """
 ArchiveIndexView, DeleteView, ListView, 
@@ -17,7 +16,15 @@ UpdateView, DateDetailView, FormView, RedirectView, View, DayArchiveView,
 GenericViewError, TemplateView, WeekArchiveView
 """
 
-from ..models import Tag, Status, Category, Post
+from djblog.models import Tag, Status, Category, Post
+
+import logging
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
+
+#from nebula.dynaform.views import DynaformMixin
+class DynaformMixin:
+    pass
 
 class PageBase(DynaformMixin):
     slug_field = 'slug'

@@ -5,7 +5,7 @@ from django.utils.timezone import now as tz_now
 from django.conf import settings
 from django.utils.decorators import wraps
 from logging import debug as __
-from nebula.common.managers import MultiSiteBaseManager
+from djblog.common.managers import MultiSiteBaseManager
 
 NEBULA_FLAGS = getattr(settings, 'NEBULA_FLAGS', {})
 

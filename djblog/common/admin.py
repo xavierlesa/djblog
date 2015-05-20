@@ -13,7 +13,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 from django.conf import settings
 from django.http import HttpResponse
-from nebula.common.models import MultiSiteBaseModel
+from djblog.common.models import MultiSiteBaseModel
 
 
 class MultiSiteBaseAdmin(admin.ModelAdmin):
@@ -39,11 +39,11 @@ class MultiSiteBaseAdmin(admin.ModelAdmin):
 
 
 class BaseAdmin(MultiSiteBaseAdmin):
-    def __init__(self, *args, **kwargs):
-        super(BaseAdmin, self).__init__(*args, **kwargs)
-        app, module, fields = args[0]._meta.app_label, args[0]._meta.module_name, [f.name for f in args[0]._meta.fields]
+    #def __init__(self, *args, **kwargs):
+    #    super(BaseAdmin, self).__init__(*args, **kwargs)
+    #    app, module, fields = args[0]._meta.app_label, args[0]._meta.module_name, [f.name for f in args[0]._meta.fields]
 
-        return super(BaseAdmin, self).__init__(*args, **kwargs)
+    #    return super(BaseAdmin, self).__init__(*args, **kwargs)
 
     save_on_top = True
     save_as = True

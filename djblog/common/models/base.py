@@ -12,8 +12,7 @@ import re
 from datetime import datetime
 from django.conf import settings
 from django.db import models, IntegrityError
-from django.db.models.signals import m2m_changed, pre_save
-from django.contrib.auth.models import User
+from django.db.models.signals import m2m_changed
 from django.contrib.sites.models import Site
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
@@ -56,28 +55,28 @@ class MultiSiteBaseModel(models.Model):
     #    return super(MultiSiteBaseManager, self).save(*args, **kwargs)
 
 
-# simula unique_together para multisitio
-def check_unique_together_with(sender, **kwargs):
-    model_instance = kwargs.get('instance', None)
-    unique_together = getattr(model_instance, 'multisite_unique_together', ())
-    action = kwargs.get('action', None)
-    sites = kwargs.get('pk_set', None)
-    model_rel = kwargs.get('model', None)
-    reverse = kwargs.get('reverse', None)
-
-    if action == 'pre_add' and (isinstance(model_rel, Site) or model_rel is Site):
-        filter_keys = dict(site__id__in=sites, lang=model_instance.lang)
-
-        for f in unique_together:
-            filter_keys.update({f:getattr(model_instance, f)})
-
-        try:
-            exist = model_instance.__class__.objects_for_admin.get(**filter_keys)
-            m = "Existe una instancia %s con estos (key) (val) para estos site(s) %s" % (model_instance.__class__, filter_keys)
-            raise IntegrityError(m)
-        except model_instance.DoesNotExist:
-            pass
-m2m_changed.connect(check_unique_together_with, sender=MultiSiteBaseModel.site.through)
+## simula unique_together para multisitio
+#def check_unique_together_with(sender, **kwargs):
+#    model_instance = kwargs.get('instance', None)
+#    unique_together = getattr(model_instance, 'multisite_unique_together', ())
+#    action = kwargs.get('action', None)
+#    sites = kwargs.get('pk_set', None)
+#    model_rel = kwargs.get('model', None)
+#    reverse = kwargs.get('reverse', None)
+#
+#    if action == 'pre_add' and (isinstance(model_rel, Site) or model_rel is Site):
+#        filter_keys = dict(site__id__in=sites, lang=model_instance.lang)
+#
+#        for f in unique_together:
+#            filter_keys.update({f:getattr(model_instance, f)})
+#
+#        try:
+#            exist = model_instance.__class__.objects_for_admin.get(**filter_keys)
+#            m = "Existe una instancia %s con estos (key) (val) para estos site(s) %s" % (model_instance.__class__, filter_keys)
+#            raise IntegrityError(m)
+#        except model_instance.DoesNotExist:
+#            pass
+#m2m_changed.connect(check_unique_together_with, sender=MultiSiteBaseModel.site.through)
 
 
 # Esta es la base abstracta de Nebula.

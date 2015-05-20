@@ -1,7 +1,13 @@
+# -*- coding:utf-8 -*-
+
 import datetime
 from haystack import indexes
 #from haystack import site
-from nebula.djblog.models import Post
+from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
+from djblog.models import Post
+import logging
+logger = logging.getLogger(__name__)
 
 class PostIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
