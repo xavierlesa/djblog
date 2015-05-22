@@ -6,6 +6,8 @@ logger = logging.getLogger(__name__)
 
 from haystack.views import SearchView
 from haystack.query import SearchQuerySet
+from djblog.models import Post
+
 #
 # Haystack View
 #
