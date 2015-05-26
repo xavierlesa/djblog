@@ -5,6 +5,7 @@ from django.conf import settings
 from django.db.models import Q
 from django.contrib.sites.models import Site
 from django.views.generic import *
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 
 """
@@ -14,7 +15,7 @@ UpdateView, DateDetailView, FormView, RedirectView, View, DayArchiveView,
 GenericViewError, TemplateView, WeekArchiveView
 """
 
-from djblog.models import Tag, Status, Category, Post
+from djblog.models import Tag, Status, Category, Post, PostType
 
 import logging
 # Get an instance of a logger
@@ -31,7 +32,7 @@ class PostBase(DynaformMixin):
 
     def get_queryset(self):
         if self.request.user.is_staff:
-            return Post.objects.get_for_lang().filter(is_page=False)
+            return Post.objects.get_for_lang().filter(post_type__post_type_slug='blog')
         return Post.objects.get_posts()
 
     def get_current_site(self):
@@ -66,6 +67,7 @@ class PostLatestListView(PostBase, ListView):
         ))
 
         templates.extend(names)
+        logger.debug('Loading theses templates names: \n%s', "\n".join(templates))
         return templates
 
 
@@ -87,6 +89,7 @@ class PostDateDetailView(PostDateBase, DateDetailView):
         ))
 
         templates.extend(names)
+        logger.debug('Loading theses templates names: \n%s', "\n".join(templates))
         return templates
 
 
@@ -108,6 +111,7 @@ class PostYearListView(PostDateBase, YearArchiveView):
         ))
 
         templates.extend(names)
+        logger.debug('Loading theses templates names: \n%s', "\n".join(templates))
         return templates
 
 
@@ -129,6 +133,7 @@ class PostMonthListView(PostDateBase, MonthArchiveView):
         ))
 
         templates.extend(names)
+        logger.debug('Loading theses templates names: \n%s', "\n".join(templates))
         return templates
 
 
@@ -150,6 +155,7 @@ class PostDayListView(PostDateBase, DayArchiveView):
         ))
 
         templates.extend(names)
+        logger.debug('Loading theses templates names: \n%s', "\n".join(templates))
         return templates
 
 
@@ -171,6 +177,7 @@ class PostWeekListView(PostDateBase, WeekArchiveView):
         ))
 
         templates.extend(names)
+        logger.debug('Loading theses templates names: \n%s', "\n".join(templates))
         return templates
 
     def get_week(self):
@@ -198,6 +205,7 @@ class PostTodayListView(PostDateBase, TodayArchiveView):
         ))
     
         templates.extend(names)
+        logger.debug('Loading theses templates names: \n%s', "\n".join(templates))
         return templates
 
 
@@ -226,6 +234,7 @@ class PostCategoryListView(PostBase, ListView):
         ))
 
         templates.extend(names)
+        logger.debug('Loading theses templates names: \n%s', "\n".join(templates))
         return templates
 
     def get_queryset(self, *args, **kwargs):
@@ -269,6 +278,7 @@ class PostAuthorListView(PostBase, ListView):
         ))
         
         templates.extend(names)
+        logger.debug('Loading theses templates names: \n%s', "\n".join(templates))
         return templates
 
     def get_queryset(self, *args, **kwargs):
@@ -310,6 +320,7 @@ class PostTagListView(PostBase, ListView):
         ))
 
         templates.extend(names)
+        logger.debug('Loading theses templates names: \n%s', "\n".join(templates))
         return templates
 
     def get_queryset(self, *args, **kwargs):
@@ -337,7 +348,7 @@ class PostDetailView(PostBase, DetailView):
 
     def get_template_names(self):
         names = super(PostDetailView, self).get_template_names()
-        page_slug = self.kwargs.get('slug', '')
+        post_slug = self.kwargs.get('slug', '')
 
         categories_site_templates = []
         categories_templates =[]
@@ -356,13 +367,174 @@ class PostDetailView(PostBase, DetailView):
         templates.extend(categories_templates)
         templates.extend((
             'djblog/%s/post_detail.html' % self.get_current_site().domain,
-            'djblog/%s_post_detail.html' % page_slug,
-            'djblog/%s/%s_post_detail.html' % (self.get_current_site().domain, page_slug),
-            'djblog/post_%s.html' % page_slug,
-            'djblog/%s/post_%s.html' % (self.get_current_site().domain, page_slug),
+            'djblog/%s_post_detail.html' % post_slug,
+            'djblog/%s/%s_post_detail.html' % (self.get_current_site().domain, post_slug),
+            'djblog/post_%s.html' % post_slug,
+            'djblog/%s/post_%s.html' % (self.get_current_site().domain, post_slug),
             'djblog/post_detail.html',
         ))
        
         templates.extend(names)
-        logger.debug('Loading theses templates names %s' % templates)
+        logger.debug('Loading theses templates names: \n%s', "\n".join(templates))
         return templates
+
+
+class GenericPostDetailView(PostBase, DetailView):
+    """
+    Detalle para un objecto generico /post_type_slug/slug
+    """
+
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return Post.objects.get_for_lang()
+        return Post.objects.get_generic_posts()
+
+    def get_template_names(self):
+        names = super(GenericPostDetailView, self).get_template_names()
+        post_type_slug = self.kwargs.get('post_type_slug', '')
+        post_slug = self.kwargs.get('slug', '')
+        domain = self.get_current_site().domain
+        categories_site_templates = []
+        categories_templates =[]
+        templates = []
+
+        obj = self.get_object()
+
+        if obj.template_name:
+            templates.append(obj.template_name)
+
+        if self.post_type:
+            post_type_slug = self.post_type.slug
+            if self.post_type.template_name:
+                templates.append(self.post_type.template_name)
+
+        if self.template_name:
+            names.remove(self.template_name)
+            templates.append(self.template_name)
+
+        for cat in self.object.category.all():
+            categories_site_templates.append('djblog/%(domain)s/%(post_type)s/%(category)s/%(slug)s_post_detail.html' % \
+                    dict(post_type=post_type_slug, domain=domain, category=cat.slug, slug=post_slug))
+
+            categories_site_templates.append('djblog/%(domain)s/%(post_type)s/%(category)s/post_%(slug)s.html' % \
+                    dict(post_type=post_type_slug, domain=domain, category=cat.slug, slug=post_slug))
+
+            categories_site_templates.append('djblog/%(domain)s/%(post_type)s/%(category)s/post_detail.html' % \
+                    dict(post_type=post_type_slug, domain=domain, category=cat.slug))
+
+            categories_templates.append('djblog/%(post_type)s/%(category)s/%(slug)s_post_detail.html' % \
+                    dict(post_type=post_type_slug, category=cat.slug, slug=post_slug))
+
+            categories_templates.append('djblog/%(post_type)s/%(category)s/post_%(slug)s.html' % \
+                    dict(post_type=post_type_slug, category=cat.slug, slug=post_slug))
+
+            categories_templates.append('djblog/%(post_type)s/%(category)s/post_detail.html' % \
+                    dict(post_type=post_type_slug, category=cat.slug))
+
+        templates.extend(categories_site_templates)
+        templates.extend((
+            'djblog/%(domain)s/%(post_type)s/%(slug)s_post_detail.html' % \
+                    dict(domain=domain, post_type=post_type_slug, slug=post_slug),
+            'djblog/%(domain)s/%(post_type)s/post_%(slug)s.html' % \
+                    dict(domain=domain, post_type=post_type_slug, slug=post_slug),
+            'djblog/%(domain)s/%(post_type)s/post_detail.html' % \
+                    dict(post_type=post_type_slug, domain=domain),
+        ))
+        
+        templates.extend(categories_templates)
+        templates.extend((
+            'djblog/%(post_type)s/%(slug)s_post_detail.html' % \
+                    dict(post_type=post_type_slug, slug=post_slug),
+            'djblog/%(post_type)s/post_%(slug)s.html' % \
+                    dict(post_type=post_type_slug, slug=post_slug),
+            'djblog/%(post_type)s/post_detail.html' % \
+                    dict(post_type=post_type_slug),
+        ))
+       
+        templates.extend(names)
+        logger.debug('Loading theses templates names: \n%s', "\n".join(templates))
+        return templates
+
+    def get_context_data(self, **kwargs):
+        """
+        Agrega al `context` el `post_type`
+        """
+        logger.info("GenericPostDetailView -> get_context_data")
+
+        post_type_slug = self.kwargs.get('post_type_slug', '')
+        context = super(GenericPostDetailView, self).get_context_data(**kwargs)
+        try:
+            context['post_type'] = PostType.objects.get(post_type_slug=post_type_slug)
+        except (PostType.DoesNotExist, PostType.MultipleObjectsReturned):
+            logger.debug("PostType %s DoesNotExist or MultipleObjectsReturned", post_type_slug)
+            pass
+
+        self.post_type = context.get('post_type')
+        return context
+
+
+
+class GenericPostListView(PostBase, ListView):
+    """
+    Listado para un objecto generico /post_type_slug/
+    """
+
+    def get_queryset(self):
+        post_type_slug = self.kwargs.get('post_type_slug', '')
+        
+        post_type = get_object_or_404(PostType, post_type_slug=post_type_slug)
+
+        if self.request.user.is_staff:
+            return Post.objects.get_for_lang().filter(post_type=post_type)
+        return Post.objects.get_generic_posts().filter(post_type=post_type)
+
+    def get_template_names(self):
+        names = super(GenericPostListView, self).get_template_names()
+        domain = self.get_current_site().domain
+        categories_site_templates = []
+        categories_templates =[]
+        templates = []
+
+        post_type_slug = self.kwargs.get('post_type_slug', '')
+
+        if self.post_type:
+            post_type_slug = self.post_type.slug
+            if self.post_type.template_name:
+                templates.append(self.post_type.template_name)
+
+        if self.template_name:
+            names.remove(self.template_name)
+            templates.append(self.template_name)
+
+        templates.extend(categories_site_templates)
+        templates.extend((
+            'djblog/%(domain)s/%(post_type)s/post_list.html' % \
+                    dict(post_type=post_type_slug, domain=domain),
+        ))
+        
+        templates.extend(categories_templates)
+        templates.extend((
+            'djblog/%(post_type)s/post_list.html' % \
+                    dict(post_type=post_type_slug),
+        ))
+       
+        templates.extend(names)
+        logger.debug('Loading theses templates names: \n%s', "\n".join(templates))
+        return templates
+
+    def get_context_data(self, **kwargs):
+        """
+        Agrega al `context` el `post_type`
+        """
+        logger.info("GenericPostListView -> get_context_data")
+
+        post_type_slug = self.kwargs.get('post_type_slug', '')
+        context = super(GenericPostListView, self).get_context_data(**kwargs)
+        try:
+            context['post_type'] = PostType.objects.get(post_type_slug=post_type_slug)
+        except (PostType.DoesNotExist, PostType.MultipleObjectsReturned):
+            logger.debug("PostType %s DoesNotExist or MultipleObjectsReturned", post_type_slug)
+            pass
+
+        self.post_type = context.get('post_type')
+        return context

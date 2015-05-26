@@ -1,5 +1,5 @@
 {% extends 'djblog/base.html' %}
-{% load djblog_tags getdynaform %}
+{% load djblog_tags %}
 {% block title %}{{ object.title }}{% endblock %}
 {% block maincontent %}
     <!-- page {{ object.id }} // category {{ category }}-->
@@ -13,16 +13,4 @@
             </div>
         </div>
     {% endblock  %}
-
-    <div class="row">
-        <div class="small-12 columns">
-            {% with forms=object|get_post_extra_content_key:'dynaform' object=object %}
-            {% for form in forms %}
-            <div class="custom-form">
-                {% dynaform_form form_slug=form.name success_url=form.field as object_form %}{{ object_form }}
-            </div>
-            {% endfor %}
-            {% endwith %}
-        </div>
-    </div>
 {% endblock  %}

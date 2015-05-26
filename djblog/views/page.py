@@ -33,7 +33,7 @@ class PageBase(DynaformMixin):
 
     def get_queryset(self):
         if self.request.user.is_staff:
-            return Post.objects.filter(is_page=True)
+            return Post.objects.get_for_lang().filter(post_type__post_type_slug='page')
         return Post.objects.get_pages()
 
     def get_current_site(self):
@@ -70,6 +70,7 @@ class PageDetailView(PageBase, DetailView):
         ))
 
         templates.extend(names)
+        logger.debug('Loading theses templates names: \n%s', "\n".join(templates))
         return templates
 
 
@@ -104,6 +105,7 @@ class PageCategoryListView(PageBase, ListView):
 
         templates.extend(r)
         templates.extend(names)
+        logger.debug('Loading theses templates names: \n%s', "\n".join(templates))
         return templates
 
     def get_queryset(self, *args, **kwargs):
@@ -153,6 +155,7 @@ class PageHierarchyDetailView(PageBase, DetailView):
 
         templates.extend(r)
         templates.extend(names)
+        logger.debug('Loading theses templates names: \n%s', "\n".join(templates))
         return templates
 
     def get_object(self, *args, **kwargs):

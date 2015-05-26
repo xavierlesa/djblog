@@ -31,7 +31,6 @@ class ExtraContentManager(models.Manager):
             qs = qs.filter(object_pk=force_unicode(model._get_pk_val()))
         return qs
 
-
 class ExtraContent(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_pk = models.PositiveIntegerField()
@@ -64,8 +63,3 @@ class ExtraContent(models.Model):
 
     class API:
         exclude = ('object_pk', 'content_type', 'content_object')
-
-################################################################################
-# prueba de install
-################################################################################
-

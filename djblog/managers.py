@@ -22,7 +22,7 @@ class SiteBlogManager(MultiSiteBaseManager):
 
 
 
-class BlogManager(MultiSiteBaseManager):
+class BaseManager(MultiSiteBaseManager):
     """
     live: son aquellos objetos que no se han borrado, es solo útil si no se quieren borrar permanentemente.
     active: son los objetos que puede ser visibles en el front.
@@ -41,12 +41,12 @@ class BlogManager(MultiSiteBaseManager):
 
 
 
-class TagManager(BlogManager):
+class TagManager(BaseManager):
     def for_site(self, *args, **kwargs):
         return self.active(*args, **kwargs)
 
 
-class CategoryManager(BlogManager):
+class CategoryManager(BaseManager):
     """
     blog: es para que solo muestre aquells categorías que son de blog, y no las de páginas.
     page: para que traiga las categorías de páginas.
@@ -68,7 +68,7 @@ class CategoryManager(BlogManager):
 
 
 
-class PostManager(BlogManager):
+class PostManager(BaseManager):
 
     def public(self, *args, **kwargs):
         """
@@ -87,25 +87,36 @@ class PostManager(BlogManager):
         obtiene los posts publicados
         """
         qs = self.public(*args, **kwargs)
-        return qs.exclude(is_page=True)
+        return qs.filter(post_type__post_type_slug='blog')
 
     def get_pages(self, *args, **kwargs):
         """
         obtiene las paginas publicadas
         """
         qs = self.public(*args, **kwargs)
-        return qs.filter(is_page=True)
+        return qs.filter(post_type__post_type_slug='page')
 
     def get_blog_posts(self, *args, **kwargs):
         """
         obtiene todo lo que sea un post y este publicado
         """
         qs = self.get_posts(*args, **kwargs)
-        return qs.filter(models.Q(category__blog_category=True) | models.Q(category__isnull=True)).distinct() # no mostrar repetidos
+        # DEPRECATED
+        #return qs.filter(models.Q(category__blog_category=True) | models.Q(category__isnull=True)).distinct() # no mostrar repetidos
+        return qs
+        
 
     def get_noblog_posts(self, *args, **kwargs):
         """
         obtiene todo lo que sea un post noblog y este publicado
         """
         qs = self.get_posts(*args, **kwargs)
-        return qs.exclude(models.Q(category__blog_category=True) | models.Q(category__isnull=True)).distinct() # no mostrar repetidos
+        # DEPRECATED
+        #return qs.exclude(models.Q(category__blog_category=True) | models.Q(category__isnull=True)).distinct() # no mostrar repetidos
+        return qs
+
+    def get_generic_posts(self, *args, **kwargs):
+        """
+        filtra el blog y las páginas para devolver los objetos genéricos
+        """
+        return self.public(*args, **kwargs).exclude(post_type__post_type_slug__in=['blog', 'page'])

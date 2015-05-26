@@ -10,47 +10,113 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from mediacontent.admin import MediaContentInline
-from djblog.models import Post, Category, Status, Tag
+from djblog.models import Post, PostType, Category, Status, Tag
 #from djblog.forms import PostAdminForm
 from djblog.content_extra.admin import ExtraContentInline
 from djblog.common.admin import BaseAdmin
 
-class PostAdmin(BaseAdmin):
+
+class PostTypeAdmin(BaseAdmin):
     list_display = (
-            'get_category', 
+            'id',
+            'post_type_name',
+            'post_type_slug',
+            'slug',
+            'lang', 
+            'get_site',
+            )
+
+    list_display_links = (
+            'id',
+            'post_type_name',
+            )
+
+    list_filter = (
+            'post_type_name', 
+            ) + BaseAdmin.list_filter
+
+    search_fields = [
+            'post_type_name', 
+            ]
+
+    prepopulated_fields = {
+            'slug': (
+                'post_type_name',
+                ),
+            'post_type_slug': (
+                'post_type_name',
+                ),
+            }
+
+    fieldsets = (
+            (None, {
+                'fields': (
+                    'post_type_name', 
+                    'post_type_slug', 
+                    (
+                        'site', 
+                        'lang', 
+                        ),
+                    'slug',
+                    )
+                }),
+            ('Templates', {
+                'fields':  (
+                    'template_name',
+                    'custom_template',
+                    ),
+                'classes': (
+                    'collapse',
+                    'select-template',
+                    )
+                }),
+            )
+
+
+class PostAdmin(BaseAdmin):
+    #form = PostAdminForm
+
+    inlines = [
+            MediaContentInline, 
+            ExtraContentInline
+            ]
+
+    list_display = (
+            'id',
             'title', 
+            'slug',
             'status', 
-            'author', 
             'get_publication_date', 
             'get_expiration_date', 
             'get_is_active', 
-            'get_is_page', 
-            'get_site'
-        )
+            'post_type', 
+            'author', 
+            'get_category', 
+            'lang',
+            'get_site',
+            )
 
     list_display_links = (
             'title',
-        )
+            )
 
     list_filter = (
+            'post_type',
             'category', 
             'author', 
-            'is_page'
-        ).__add__(BaseAdmin.list_filter)
+            ) + BaseAdmin.list_filter
 
     search_fields = [
             'title', 
             'copete', 
             'content'
-        ]
+            ]
 
-    #form = PostAdminForm
-    
-    inlines = [MediaContentInline, ExtraContentInline]
-    
     prepopulated_fields = {
-            'slug': ('title',),
-        }
+            'slug': (
+                'title',
+                ),
+            }
 
     # solo mostrar los objetos del usuario, o todo si es superuser
     def queryset(self, request):
@@ -72,74 +138,103 @@ class PostAdmin(BaseAdmin):
 
     def add_view(self, request, form_url='', extra_context={}):
         self.fieldsets = (
-            (None, {
-                'fields': (
-                    'title', 
-                    'slug', 
-                    'copete', 
-                    'content_rendered', 
-                    'category', 
-                    'site', 
-                    (
-                        'is_page', 
-                        'status', 
-                        'author'
-                    )
+                (None, {
+                    'fields': (
+                        'title', 
+                        'slug', 
+                        'copete', 
+                        'content', 
+                        'content_rendered', 
+                        'category', 
+                        (
+                            'post_type',
+                            'status', 
+                            'author'
+                            ),
+                        (
+                            'site', 
+                            'lang', 
+                            ),
+                        )
+                    }),
+                ('Templates', {
+                    'fields':  (
+                        'template_name',
+                        'custom_template',
+                        ),
+                    'classes': (
+                        'collapse',
+                        'select-template',
+                        )
+                    }),
                 )
-            }),
-        )
+
         return super(PostAdmin, self).add_view(request, form_url, extra_context)
 
     def change_view(self, request, object_id, extra_context={}):
         self.fieldsets = (
-            (None, {
-                'fields': (
-                    'title', 
-                    'slug', 
-                    'copete', 
-                    'content_rendered', 
-                    'category', 
-                    'site', 
-                    (
-                        'is_page', 
-                        'status', 
-                        'author'
-                    )
-                )
-            }),
-            ('Comments', {
-                'fields': (
-                    'allow_comments', 
-                    'comments_finish_date'
-                ),
-                'classes': (
-                    'collapse',
-                )
-            }),
-            ('Scheduling', {
-                'fields': (
-                    (
-                        'publication_date', 
-                        'expiration_date'
-                    ),
-                ),
-                'classes': (
-                    'collapse',
-                )
-            }),
-            ('Relationships', {
-                'fields': (
-                    (
-                        'followup_for', 
-                        'related'
-                    ), 
-                    'tags'
-                ),
-                'classes': (
-                    'collapse',
-                )
-            }),
-        ).__add__(BaseAdmin.fieldsets)
+                (None, {
+                    'fields': (
+                        'title', 
+                        'slug', 
+                        'copete', 
+                        'content',
+                        'content_rendered', 
+                        'category', 
+                        (
+                            'post_type',
+                            'status', 
+                            'author'
+                            ),
+                        (
+                            'site', 
+                            'lang', 
+                            ),
+                        )
+                    }),
+                ('Templates', {
+                    'fields':  (
+                        'template_name',
+                        'custom_template',
+                        ),
+                    'classes': (
+                        'collapse',
+                        'select-template',
+                        )
+                    }),
+                ('Comments', {
+                    'fields': (
+                        'allow_comments', 
+                        'comments_finish_date'
+                        ),
+                    'classes': (
+                        'collapse',
+                        )
+                    }),
+                ('Scheduling', {
+                    'fields': (
+                        (
+                            'publication_date', 
+                            'expiration_date'
+                            ),
+                        ),
+                    'classes': (
+                        'collapse',
+                        )
+                    }),
+                ('Relationships', {
+                    'fields': (
+                        (
+                            #'followup_for', 
+                            'related'
+                            ), 
+                        'tags'
+                        ),
+                    'classes': (
+                        'collapse',
+                        )
+                    }),
+                ) + BaseAdmin.fieldsets
 
         return super(PostAdmin, self).change_view(request, object_id, extra_context=extra_context)
 
@@ -150,42 +245,40 @@ class PostAdmin(BaseAdmin):
 
         if obj.expiration_date and obj.expiration_date <= timezone.now():
             return mark_safe('<span style="color:orange">expiro hace %s</span>' % timesince(obj.expiration_date))
+
         return mark_safe('<span style="color:green">expira en %s</span>' % timeuntil(obj.expiration_date))
+
     get_expiration_date.allow_tags = True
     get_expiration_date.short_description = _(u"expiration_date")
 
     def get_publication_date(self, obj):
         if obj.publication_date and obj.publication_date <= timezone.now():
             return mark_safe('<span style="color:green">publicado hace %s</span>' % timesince(obj.publication_date))
+
         return mark_safe('<span style="color:blue">se publica en %s</span>' % timeuntil(obj.publication_date))
+
     get_publication_date.allow_tags = True
     get_publication_date.short_description = _(u"publication_date")
 
-    def get_is_page(self, obj):
-        if obj.is_page:
-            return u'Página' #mark_safe(u'<img src="%simg/admin/page.png" title="Página" alt="Página" />' % settings.MEDIA_URL)
-        elif obj.category.noblog():
-            return u'Post no de blog' #mark_safe(u'<img src="%simg/admin/noblog-post.png" title="no blog post" alt="no blog post" />' % settings.MEDIA_URL)
-        return u'Post del blog'
-    get_is_page.short_description = u'(no)blog post o página'
-    get_is_page.allow_tags = True
-
     def get_category(self, obj):
         return ', '.join([c.name for c in obj.category.all()])
+
     get_category.short_description = _(u'In Category')
- 
+
     def get_tags(self, obj):
         return ', '.join([c.name for c in obj.tags.all()])
+
     get_tags.short_description = _(u'Tags')
 
     def mark_active(self, request, queryset):
         queryset.update(is_active=True)
+
     mark_active.short_description = _(u'Mark select articles as active')
 
     def mark_inactive(self, request, queryset):
         queryset.update(is_active=False)
-    mark_inactive.short_description = _(u'Mark select articles as inactive')
 
+    mark_inactive.short_description = _(u'Mark select articles as inactive')
 
 
 
@@ -197,46 +290,46 @@ class CategoryAdmin(BaseAdmin):
             'get_blog_category', 
             'get_is_active', 
             'get_site'
-        )
+            )
 
     list_filter = (
             'level',
             'blog_category',
             'site'
-        ).__add__(BaseAdmin.list_filter)
+            ) + BaseAdmin.list_filter
 
     prepopulated_fields = {
             'slug': (
                 'name',
-            )
-        } 
+                )
+            } 
 
     fieldsets = (
-        (None, {
-            'fields': (
-                'name', 
-                'slug', 
-                'show_on_list', 
-                'parent', 
-                'description', 
-                'site'
-            )
-        }),
-        ('Advanced', {
-            'fields': (
-                'blog_category', 
-                'level'
-            ),
-            'classes': (
-                'collapse',
-            )
-        }),
-    ).__add__(BaseAdmin.fieldsets)
+            (None, {
+                'fields': (
+                    'name', 
+                    'slug', 
+                    'show_on_list', 
+                    'parent', 
+                    'description', 
+                    'site'
+                    )
+                }),
+            ('Advanced', {
+                'fields': (
+                    'blog_category', 
+                    'level'
+                    ),
+                'classes': (
+                    'collapse',
+                    )
+                }),
+            ) + BaseAdmin.fieldsets
 
     def get_blog_category(self, obj):
         if obj.blog_category:
-            return u'de Blog' #mark_safe('<img src="%(media)simg/admin/accept.png" alt="%(alt)s" />' % dict(media=settings.MEDIA_URL, alt=True))
-        return u'No de Blog' #mark_safe('<img src="%(media)simg/admin/cross.png" alt="%(alt)s" />' % dict(media=settings.MEDIA_URL, alt=True))
+            return u'de Blog'
+        return u'No de Blog'
     get_blog_category.short_description = u'categoría de blog'
     get_blog_category.allow_tags = True
 
@@ -244,12 +337,16 @@ class CategoryAdmin(BaseAdmin):
 
 
 class StatusAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'get_is_public')
+    list_display = (
+            'name', 
+            'description', 
+            'get_is_public'
+            )
 
     def get_is_public(self, obj):
         if obj.is_public:
-            return u'Público' #mark_safe('<img src="%(media)simg/admin/accept.png" alt="%(alt)s" />' % dict(media=settings.MEDIA_URL, alt=True))
-        return u'Borrador' #mark_safe('<img src="%(media)simg/admin/cross.png" alt="%(alt)s" />' % dict(media=settings.MEDIA_URL, alt=True))
+            return u'Público'
+        return u'Borrador'
     get_is_public.short_description = u'es público'
     get_is_public.allow_tags = True
 
@@ -260,28 +357,31 @@ class TagAdmin(BaseAdmin):
             'name', 
             'get_is_active', 
             'get_site',
-        )
+            )
 
     list_filter = (
             'is_active', 
             'site',
-        )
+            )
 
     prepopulated_fields = {
             'slug': (
                 'name',
-            )}
+                )
+            }
 
     fieldsets = (
-        (None, {
-            'fields': (
-                'name', 
-                'slug'
-                )
-            }),
-        ).__add__(BaseAdmin.fieldsets)
+            (None, {
+                'fields': (
+                    'name', 
+                    'slug'
+                    )
+                }),
+            ) + BaseAdmin.fieldsets
 
 
+
+admin.site.register(PostType, PostTypeAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Status, StatusAdmin)

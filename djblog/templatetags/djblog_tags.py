@@ -2,7 +2,7 @@
 
 from django.db.models import Q, F
 from django.db.models.query import QuerySet
-from django.template import Template, loader
+from django.template import RequestContext, Context, Template, loader
 from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.template.defaultfilters import slugify, striptags, truncatewords, \
@@ -84,6 +84,14 @@ def post_image(context, *args, **kwargs):
         iqs = obj.media_content.filter(mimetype__startswith="image", title=kwargs['title'])
         if iqs.exists():
             img = iqs[0]
+    elif kwargs.has_key('thumbnail_only'):
+        iqs = obj.media_content.get_thumbnail()
+        if iqs.exists():
+            img = iqs[0]
+    elif kwargs.has_key('gallery_only'):
+        iqs = obj.media_content.get_gallery()
+        if iqs.exists():
+            img = iqs[0]
     else:
         img = obj.get_first_image()
 
@@ -135,7 +143,7 @@ def post_image(context, *args, **kwargs):
 
 # the extract
 @register.simple_tag(takes_context=True)
-def post_extract(context, splitter='<!--more-->', tag_link='<a href="%s">Leer más</a>', 
+def post_extract(context, splitter='<!--more-->', tag_link='<a href="%s">Leer m&aacute;s</a>', 
         limit=0, limit_chars=0, is_markdown=False, is_safe=False, *args, **kwargs):
     """
     Genera el extracto a partir del copete o el contenido.
@@ -158,6 +166,8 @@ def post_extract(context, splitter='<!--more-->', tag_link='<a href="%s">Leer m�
     else:
         data = obj.content
 
+    data = extract(data, splitter)[0]
+
     if is_markdown:
         data = markdown(data)
 
@@ -169,7 +179,9 @@ def post_extract(context, splitter='<!--more-->', tag_link='<a href="%s">Leer m�
     elif limit:
         return truncatewords(data, limit)
 
-    return "%s %s" % (extract(data, splitter)[0], tag_link % obj.get_absolute_url())
+    post_link = tag_link % obj.get_absolute_url()
+
+    return u"%s %s" % (data, post_link)
 
 
 # date of post
@@ -210,8 +222,62 @@ def post_content(context, is_markdown=False, *args, **kwargs):
     else:
         tpl = loader.select_template(default_template)
 
-    context.update({'content': mark_safe(markdown(content))})
-    return mark_safe(tpl.render(context))
+    custom_context = Context({
+        'content': mark_safe(markdown(content))
+        })
+
+    custom_context.update(context)
+
+    return mark_safe(tpl.render(custom_context))
+
+
+# the link
+@register.assignment_tag(takes_context=True)
+def post_link(context, extra_content_only=False):
+    """
+    Devuelve el un `dict` con la `url` y `attribs` de un objeto o la url absoluta.
+
+    Sí tiene `extra_content` asociado con `key`='link' usa éste para generar la URL.
+    Sí el flag extra_content_only es True, solo devuelve un link si éste está 
+    asociado a `extra_content`.
+
+    key=link,
+    name:
+        url -> href
+        attribs -> atributos del tag A
+
+    """
+    obj = context['object']
+
+    link = obj.get_extra_content().filter(key__iexact='link')
+
+    if link:
+        try:
+            url = link.get(name__iexact='url')
+        except:
+            url = obj.get_absolute_url()
+        else:
+            url = url.field
+
+        try:
+            attribs = link.get(name__iexact='attribs')
+        except:
+            attribs = ''
+        else:
+            attribs = attribs.field
+
+    else:
+        if extra_content_only:
+            return None
+
+        url = obj.get_absolute_url()
+        attribs = ''
+
+    return {
+        'url': mark_safe(url),
+        'attribs': mark_safe(attribs)
+    }
+
 
 
 # the archive
@@ -226,9 +292,11 @@ def post_archive(*args, **kwargs):
     {% endfor %}
     </ul>
     """
-    return Post.objects.dates('publication_date', 'month')
+    return Post.objects.get_blog_posts().dates('publication_date', 'month')
     
 
+# TODO: este filtro está deprecated hay que usar post_embed y usar tagembed para
+# resolver los embeds
 @register.filter
 def post_video(obj, key=None):
     try:
@@ -265,9 +333,8 @@ def get_pages_from_category(cat, recursive=None):
     return qs.distinct()
 
 
-# TODO: deberiamos cambiarlo a get_posts_from_category
 @register.assignment_tag
-def get_from_category(cat, recursive=None):
+def get_posts_from_category(cat, recursive=None):
     """
     Devuelve el QuerySet de post para una categoría.
     {% get_posts_from_category cat=category-slug [recursive=recursive] as object_list %}
@@ -275,12 +342,11 @@ def get_from_category(cat, recursive=None):
     recursive=recursive
     """
     if recursive == 'recursive':
-        qs = Post.objects.public().filter(Q(category__slug=cat) | Q(category__parent__slug=cat))
+        qs = Post.objects.get_blog_posts().filter(Q(category__slug=cat) | Q(category__parent__slug=cat))
     else:
-        qs = Post.objects.public().filter(category__slug=cat)
+        qs = Post.objects.get_blog_posts().filter(category__slug=cat)
     return qs.distinct()
 
-register.assignment_tag(name='get_posts_from_category')(get_from_category)
 
 @register.assignment_tag
 def get_post_or_page(slug=None, id=None):
@@ -302,6 +368,28 @@ def get_post_or_page(slug=None, id=None):
 
     return ''
 
+
+# NEW in 0.2
+@register.assignment_tag(takes_context=True)
+def get_posts_from_post_type(context, post_type=''):
+    """
+    Retorna un QuerySet filtrando el `post_type` del argumento o el mismo post_type del contexto['object']
+
+    {% get_posts_from_post_type [post_type='post_type_slug'|post_type=<post_type_instance>] as object_list %}
+    """
+    qs = Post.objects.public()
+
+    if not post_type:
+        obj = context['object']
+        if hasattr(obj, 'post_type'):
+            post_type = obj.post_type
+
+    if isinstance(post_type, basestring):
+        qs = qs.filter(post_type__post_type_slug=post_type)
+    else:
+        qs = qs.filter(post_type=post_type)
+
+    return qs
 
 @register.filter
 def get_post_extra_content_key_name(obj, key_name=None):
@@ -434,13 +522,15 @@ def get_columns(qs, cols):
     """
     return len(qs) / cols
 
-@register.filter
+#@register.filter
 def extract(obj, splitter='<!--more-->'):
     """
     Devuelve el contenido del post/page partido por el splitter
     {{ object|extract:'<!--more-->' }}
     """    
     return obj.split(splitter)
+
+register.filter('extract', extract)
 
 @register.filter
 def has_category(obj, cat):

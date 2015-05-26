@@ -27,7 +27,7 @@ from mediacontent.models import MediaContent
 
 from djblog.content_extra.models import ExtraContent, ContentType
 from djblog.managers import TagManager, CategoryManager, PostManager
-from djblog.common.models import BaseModel, ContentModel, CategoryModel
+from djblog.common.models import BaseModel, ContentModel, CategoryModel, CustomTemplate
 
 DJBLOG_PREVIEW_CONTENT_SIZE = getattr(settings, 'DJBLOG_PREVIEW_CONTENT_SIZE', 45)
 DJBLOG_CONTENT_FORMAT = getattr(settings, 'DJBLOG_CONTENT_FORMAT', 'html') # plain = plano, html
@@ -38,7 +38,9 @@ DJBLOG_LAYOUT_TEMPLATE = getattr(settings, 'DJBLOG_LAYOUT_TEMPLATE',
         ('3col', '3 columnas'),
     )
 )
-DJBLOG_DEFAULT_POST_URL_NAME = getattr(settings, 'DJBLOG_DEFAULT_POST_URL_NAME', 'post_detail')
+DJBLOG_DEFAULT_POST_URL_NAME = getattr(settings, 'DJBLOG_DEFAULT_POST_URL_NAME', 'blog_detail')
+DJBLOG_GENERIC_POST_DETAIL_URL_NAME = getattr(settings, 'DJBLOG_GENERIC_POST_DETAIL_URL_NAME', 'generic_post_detail')
+DJBLOG_GENERIC_POST_LIST_URL_NAME = getattr(settings, 'DJBLOG_GENERIC_POST_LIST_URL_NAME', 'generic_post_list')
 
 class Tag(BaseModel):
     name = models.CharField(max_length=64, unique=True)
@@ -130,18 +132,51 @@ class Category(BaseModel, CategoryModel):
         verbose_name = _(u"Categoría")
 
 
-class Post(BaseModel, ContentModel):
+# NEW: Ahora se puede elegir el tipo de contenido e impacta en cómo se va a 
+# usar la URL y los tempaltes, así se pueden customizar aun más
+
+class PostType(CustomTemplate, BaseModel):
+    post_type_name = models.CharField(_(u"Tipo de objeto"), max_length=100, 
+            help_text=_(u"Determina el uso y comportamiento del Post, \n\
+                    siendo `Post` y `Página` los reservados y por defecto."))
+
+    post_type_slug = models.SlugField(_(u"Slug del tipo"), 
+            help_text=_(u"Importante para determinar el inicio de URL. \n\
+                    Ej: Para el `slug` `autos` \n\
+                    /post_type_slug/slug/ -> /autos/peugeot-208/"))
+
+    def __unicode__(self):
+        return self.post_type_name
+
+    @property
+    def is_page(self):
+        return self.post_type_slug == 'page'
+
+    @property
+    def is_blog(self):
+        return self.post_type_slug == 'blog'
+
+    @models.permalink
+    def get_absolute_url(self):
+        return (DJBLOG_GENERIC_POST_LIST_URL_NAME, (), {
+            'post_type_slug': self.post_type_slug, 
+            })
+
+
+class Post(CustomTemplate, BaseModel, ContentModel):
     """
     Post o Página
 
     title, copete, content, content_rendered
     """
-    is_page = models.BooleanField(default=False, blank=True, 
-            choices=(
-                (False, u"Post"),
-                (True, u"Página")
-            ), 
-            verbose_name=_(u"Mostrar como"))
+    #is_page = models.BooleanField(default=False, blank=True, 
+    #        choices=(
+    #            (False, u"Post"),
+    #            (True, u"Página")
+    #        ), 
+    #        verbose_name=_(u"Tipo de posteo"))
+
+    post_type = models.ForeignKey(PostType)
 
     publication_date = models.DateTimeField(verbose_name=_(u"Fecha de publicación"))
     expiration_date = models.DateTimeField(blank=True, null=True, 
@@ -153,8 +188,10 @@ class Post(BaseModel, ContentModel):
     status = models.ForeignKey(Status, blank=True, null=True)
 
     tags = models.ManyToManyField(Tag, blank=True, help_text=_(u"Tags descriptívos"))
-    followup_for = models.ManyToManyField('self', symmetrical=False, blank=True, 
-            related_name='followups', verbose_name=_(u"Contenido sugerido"))
+
+    # Deprecado, nunca se usó
+    #followup_for = models.ManyToManyField('self', symmetrical=False, blank=True, 
+    #        related_name='followups', verbose_name=_(u"Contenido sugerido"))
 
     related = models.ManyToManyField('self', blank=True, 
             verbose_name=_(u"Contenido relacionado"))
@@ -165,28 +202,24 @@ class Post(BaseModel, ContentModel):
     comments_finish_date = models.DateTimeField(blank=True, null=True, 
             verbose_name=_(u"Cerrar automáticamente"))
 
-    template_name = models.CharField(max_length=200, blank=True, null=True, 
-            help_text=_(u"Define un template para este objeto (post o página). \
-                    path/al/template(nombre_template.html"))
-
-    custom_template = models.TextField(verbose_name=_(u"Template HTML/Daango"), 
-            blank=True, null=True)
 
     objects = PostManager()
 
     class Meta:
         get_latest_by = 'publication_date'
         ordering = ('-publication_date', 'title')
-        verbose_name_plural = _(u"Posts y Páginas")
-        verbose_name = _(u"Post o Página")
+        verbose_name_plural = _(u"Posts")
+        verbose_name = _(u"Post")
 
     @models.permalink
     def get_absolute_url(self):
         """
         Resuelve la URL para un objeto
         """
+
         # es una página
-        if self.is_page:
+        #if self.is_page:
+        if self.post_type.is_page:
             # es un post noblog
             if self.category.all():
                 category = self.get_tree_category()
@@ -198,12 +231,21 @@ class Post(BaseModel, ContentModel):
             
             return (u'page_detail', (self.slug,))
 
-        if DJBLOG_DEFAULT_POST_URL_NAME == 'post_detail':
-            pub_date = self.publication_date.strftime('%Y %m %d').split()
-            pub_date.append(self.slug)
-            return ('post_detail', pub_date)
+        elif self.post_type.is_blog:
+            if DJBLOG_DEFAULT_POST_URL_NAME == 'blog_detail':
+                pub_date = self.publication_date.strftime('%Y %m %d').split()
+                pub_date.append(self.slug)
+                return ('blog_detail', pub_date)
 
-        return (DJBLOG_DEFAULT_POST_URL_NAME, (), {'slug':self.slug})
+            return (DJBLOG_DEFAULT_POST_URL_NAME, (), {'slug':self.slug})
+
+        # URL genérica para los demas tipos de objetos
+        # /post_type_slug/slug/
+        return (DJBLOG_GENERIC_POST_DETAIL_URL_NAME, (), {
+            'post_type_slug': self.post_type.post_type_slug, 
+            'slug':self.slug
+            })
+
 
     def save(self, *args, **kwargs):
         # fix error del prepopulated
@@ -312,10 +354,3 @@ class Post(BaseModel, ContentModel):
                         return obj
         return ''
     first_image = property(get_first_image)
-
-    def get_template(self):
-        """
-        Resuelve el template a utilizar para el render
-
-        """
-        pass
