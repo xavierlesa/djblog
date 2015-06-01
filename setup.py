@@ -15,6 +15,7 @@ setup(name='djblog',
         install_requires=[
             'pytz',
             'Markdown',
+            'django-wysiwyg-redactor',
             'requests',
         ],
         dependency_links=[

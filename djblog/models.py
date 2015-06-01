@@ -322,8 +322,9 @@ class Post(CustomTemplate, BaseModel, ContentModel):
     def get_first_paragraph(self):
         parsed_content = self.parse_content()
 
-        if not isinstance(parsed_content, collections.Iterable):
-            return ""
+        if not isinstance(parsed_content, collections.Iterable) and isinstance(parsed_content, basestring):
+            extract = parsed_content.split('<!--more-->')
+            return extract[0]
 
         for row in parsed_content:
             for obj in row:
@@ -344,13 +345,20 @@ class Post(CustomTemplate, BaseModel, ContentModel):
 
         parsed_content = self.parse_content()
         
-        if not isinstance(parsed_content, collections.Iterable):
-            return ""
+        if isinstance(parsed_content, collections.Iterable):
+            if parsed_content:
+                for row in parsed_content:
+                    for obj in row:
+                        if obj['type'] == 'img' or obj['type'] == 'video:youtube':
+                            return obj
 
-        if parsed_content:
-            for row in parsed_content:
-                for obj in row:
-                    if obj['type'] == 'img' or obj['type'] == 'video:youtube':
-                        return obj
-        return ''
+        if not parsed_content or isinstance(parsed_content, basestring):
+            import re
+            imgtag = re.compile(r'<img[^>]*\ssrc="(.*?)"')
+            images = imgtag.findall(self.content_rendered)
+            if images:
+                logger.info('imagen %s', images[0]) 
+                return images[0]
+
+        return ""
     first_image = property(get_first_image)

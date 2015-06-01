@@ -15,6 +15,15 @@ from djblog.models import Post, PostType, Category, Status, Tag
 from djblog.content_extra.admin import ExtraContentInline
 from djblog.common.admin import BaseAdmin
 
+from redactor.widgets import RedactorEditor
+
+class PostAdminForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        exclude = []
+        widgets = {
+           'content_rendered': RedactorEditor(),
+        }
 
 class PostTypeAdmin(BaseAdmin):
     list_display = (
@@ -74,7 +83,7 @@ class PostTypeAdmin(BaseAdmin):
 
 
 class PostAdmin(BaseAdmin):
-    #form = PostAdminForm
+    form = PostAdminForm
 
     inlines = [
             MediaContentInline, 
@@ -118,6 +127,13 @@ class PostAdmin(BaseAdmin):
                 ),
             }
 
+    class Media:
+        css = {
+                'all': (
+                    'djblog/css/font-awesome.css',
+                    ),
+                }
+
     # solo mostrar los objetos del usuario, o todo si es superuser
     def queryset(self, request):
         qs = super(PostAdmin, self).queryset(request)
@@ -143,7 +159,7 @@ class PostAdmin(BaseAdmin):
                         'title', 
                         'slug', 
                         'copete', 
-                        'content', 
+                        #'content', 
                         'content_rendered', 
                         'category', 
                         (
@@ -178,7 +194,7 @@ class PostAdmin(BaseAdmin):
                         'title', 
                         'slug', 
                         'copete', 
-                        'content',
+                        #'content',
                         'content_rendered', 
                         'category', 
                         (

@@ -98,6 +98,8 @@ def post_image(context, *args, **kwargs):
     if not img or not isinstance(img, MediaContent) or not img.content:
         if fallback:
             return mark_safe('<img src="%s" %s />' % (fallback, attrs))
+        elif isinstance(img, basestring):
+            return mark_safe('<img src="%s" />' % img)
         else:
             return ''
     
