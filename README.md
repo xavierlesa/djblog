@@ -6,16 +6,14 @@ App para crear contenido dinamico, como un blog
 
 # Templatetags
 
-## post_title
+### post_title ###
 Devuelve el título de un post/pagina
-
 ```
 #!python
 {% post_title %}
 ```
 
 Por defecto ```post_title``` resuelve el ```object``` desde el contexto, pero es posible pasar uno desde los argumentos.
-
 ```
 #!python
 {% post_title [object=post [limit=12]] %}
@@ -24,9 +22,8 @@ Por defecto ```post_title``` resuelve el ```object``` desde el contexto, pero es
 Es posible limitar la cantidad de caracteres pasando el argumento limit.
 
 
-## post_image
+### post_image ###
 Devuelve la imagen principal asociada al post/page
-
 ```
 #!python
 {% post_image [size=[320x200|thumbnail|gallery] attrs="class='thumb'"] %}
@@ -39,16 +36,14 @@ No tiene ningún argumento obligatorio, pero si es posible modificar el tamaño 
 **attrs**: Son pasados cómo vienen al tag ```<img src=... %(attrs)s/>```
 
 
-## post_extract
+### post_extract ###
 Genera el extracto a partir del contenido.
-
 ```
 #!python
 {% post_extract %}
 ```
 
 Por defecto ```post_extract``` resuelve el ```object``` desde el contexto, pero es posible pasar uno desde los argumentos.
-
 ```
 #!python
 {% post_extract object=post [limit=40 [limit_chars=200]] %}
@@ -57,9 +52,8 @@ Por defecto ```post_extract``` resuelve el ```object``` desde el contexto, pero 
 Por defecto limita a 30 palabras, pero es posible pasar los argumentos ```limit``` o ```limir_chars``` para controlar los límites.
 
 
-## post_date
+### post_date ###
 Retorna la fecha el post/page ```publication_date```.
-
 ```
 #!python
 {% post_date [format="l j, F"] %}
@@ -68,18 +62,16 @@ Retorna la fecha el post/page ```publication_date```.
 User los siguientes formatos https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
 
 
-## post_content
+### post_content ###
 Retorna el contenido renderizado del post/page ```content_render```
-
 ```
 #!python
 {% post_content %}
 ```
 
 
-## post_archive
+### post_archive ###
 Retorna un ```QuerySet``` con el "Archivo" de los post/page por meses.
-
 ```
 #!python
 <ul>
@@ -91,7 +83,7 @@ Retorna un ```QuerySet``` con el "Archivo" de los post/page por meses.
 ```
 
 
-## get_pages_from_category
+### get_pages_from_category ###
 Devuelve el ```QuerySet``` de ```page``` para una categoría.
 
 ```
