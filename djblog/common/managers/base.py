@@ -12,10 +12,11 @@ from django.conf import settings
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import force_unicode
-from django.contrib.sites.models import Site
 from django.utils import translation
 import logging
 logger = logging.getLogger(__name__)
+
+
 
 __ALL__ = ('MultiSiteBaseManager','MultiSiteBaseManagerAdmin','BaseManager','GenericRelationManager')
 
@@ -25,7 +26,7 @@ class MultiSiteBaseManager(models.Manager):
         Registros para el site actual o sin site 
         """
         qs = super(MultiSiteBaseManager, self).get_queryset(*args, **kwargs)
-        qs = qs.filter(models.Q(site__id__in=[Site.objects.get_current().pk,]) | models.Q(site__isnull=True))
+        qs = qs.filter(models.Q(site__id__in=[settings.SITE_ID,]) | models.Q(site__isnull=True))
         return qs
 
     def get_for_lang(self, *args, **kwargs):
@@ -44,7 +45,7 @@ class MultiSiteBaseManager(models.Manager):
         Registros para el site actual 
         """
         qs = super(MultiSiteBaseManager, self).get_queryset(*args, **kwargs)
-        return qs.filter(site__id__in=[Site.objects.get_current().pk,])
+        return qs.filter(site__id__in=[settings.SITE_ID,])
 
 
 class MultiSiteBaseManagerAdmin(models.Manager):
