@@ -6,7 +6,7 @@ App para crear contenido dinamico, como un blog
 
 # Templatetags
 
-## post_title [¶](djblog#markdown-header-post_title)
+## post_title
 Devuelve el título de un post/pagina
 
 ```
@@ -24,7 +24,7 @@ Por defecto ```post_title``` resuelve el ```object``` desde el contexto, pero es
 Es posible limitar la cantidad de caracteres pasando el argumento limit.
 
 
-## post_image [¶](djblog#markdown-header-post_image)
+## post_image
 Devuelve la imagen principal asociada al post/page
 
 ```
@@ -39,7 +39,7 @@ No tiene ningún argumento obligatorio, pero si es posible modificar el tamaño 
 **attrs**: Son pasados cómo vienen al tag ```<img src=... %(attrs)s/>```
 
 
-## post_extract [¶](djblog#markdown-header-post_extract)
+## post_extract
 Genera el extracto a partir del contenido.
 
 ```
@@ -57,7 +57,7 @@ Por defecto ```post_extract``` resuelve el ```object``` desde el contexto, pero 
 Por defecto limita a 30 palabras, pero es posible pasar los argumentos ```limit``` o ```limir_chars``` para controlar los límites.
 
 
-## post_date [¶](djblog#markdown-header-post_date)
+## post_date
 Retorna la fecha el post/page ```publication_date```.
 
 ```
@@ -68,7 +68,7 @@ Retorna la fecha el post/page ```publication_date```.
 User los siguientes formatos https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
 
 
-## post_content [¶](djblog#markdown-header-post_content)
+## post_content
 Retorna el contenido renderizado del post/page ```content_render```
 
 ```
@@ -77,7 +77,7 @@ Retorna el contenido renderizado del post/page ```content_render```
 ```
 
 
-## post_archive [¶](djblog#markdown-header-post_archive)
+## post_archive
 Retorna un ```QuerySet``` con el "Archivo" de los post/page por meses.
 
 ```
@@ -91,7 +91,7 @@ Retorna un ```QuerySet``` con el "Archivo" de los post/page por meses.
 ```
 
 
-## get_pages_from_category [¶](djblog#markdown-header-get_pages_from_category)
+## get_pages_from_category
 Devuelve el ```QuerySet``` de ```page``` para una categoría.
 
 ```
@@ -102,7 +102,7 @@ Devuelve el ```QuerySet``` de ```page``` para una categoría.
 Si se quiere incluir las categorías ```childs``` hay que agregar el argumento ```recursive=recursive```
 
 
-## get_posts_from_category [¶](djblog#markdown-header-get_posts_from_category)
+## get_posts_from_category 
 Devuelve el ```QuerySet``` de ```post``` para una categoría.
 
 ```
@@ -113,7 +113,7 @@ Devuelve el ```QuerySet``` de ```post``` para una categoría.
 Si se quiere incluir las categorías ```childs``` hay que agregar el argumento ```recursive=recursive```
 
 
-## get_post_or_page [¶](djblog#markdown-header-get_post_or_page)
+## get_post_or_page 
 Retorna un ```post``` o ```page``` por ```slug``` o ```ID```
 
 ```
@@ -122,7 +122,7 @@ Retorna un ```post``` o ```page``` por ```slug``` o ```ID```
 ```
 
 
-## get_category [¶](djblog#markdown-header-get_category)
+## get_category 
 Retorna una ```category``` por ```slug```
 
 ```
@@ -130,7 +130,7 @@ Retorna una ```category``` por ```slug```
 {% get_category slug='category-name' as object %}
 ```
 
-## get_all_categories [¶](markdown-header-get_all_categories)
+## get_all_categories 
 
 ```
 #!python
@@ -152,7 +152,7 @@ flag `blog_category=True`.
 de 2 niveles por defecto, pero se puede ajustar desde `max_level`.
 
 
-## get_sub_categories [¶](djblog#markdown-header-get_sub_categories)
+## get_sub_categories 
 Retorna las ```category``` del post/page donde el ```parent``` es el ```slug``` del argumento.
 
 ```
@@ -160,7 +160,7 @@ Retorna las ```category``` del post/page donde el ```parent``` es el ```slug``` 
 {% get_sub_categories slug=category-name as object_list %}
 ```
 
-## get_posts_for_tags [¶](djblog#markdown-header-get_posts_for_tags)
+## get_posts_for_tags 
 Filtra por `taxonomia` los `post` con los `tags` asociados
 
 ```
@@ -169,7 +169,7 @@ Filtra por `taxonomia` los `post` con los `tags` asociados
 ```
 
 
-## get_tags_list [¶](djblog#markdown-header-get_tags_list)
+## get_tags_list 
 Retorna todos los `tags` acumulados
 
 ```
@@ -178,9 +178,9 @@ Retorna todos los `tags` acumulados
 ```
 
 
-# Filtros [¶](djblog#markdown-header-filtros)
+# Filtros 
 
-## post_video [¶](djblog#markdown-header-post_video)
+## post_video 
 Devuelve un video asociado, busca en ```extra_content``` si tiene un objeto con el ```key``` ```video```.
 En caso de no tener busca en las columnas del ```parse_content``` con el tipo ```video:youtube```
 
@@ -189,7 +189,7 @@ En caso de no tener busca en las columnas del ```parse_content``` con el tipo ``
 {{ object|post_video }}
 ```
 
-## get_post_extra_content_key_name [¶](djblog#markdown-header-get_post_extra_content_key_name)
+## get_post_extra_content_key_name 
 Devuelve los ```extra_content``` asociados al post/page filtrando por ```key``` y ```name```
 
 ```
@@ -198,7 +198,7 @@ Devuelve los ```extra_content``` asociados al post/page filtrando por ```key``` 
 ```
 
 
-## get_post_extra_content_key [¶](djblog#markdown-header-get_post_extra_content_key)
+## get_post_extra_content_key 
 Devuelve los ```extra_content``` asociados al post/page filtrando por ```key```
 
 ```
@@ -207,7 +207,7 @@ Devuelve los ```extra_content``` asociados al post/page filtrando por ```key```
 ```
 
 
-## get_post_extra_content_by_keys [¶](djblog#markdown-header-get_post_extra_content_by_keys)
+## get_post_extra_content_by_keys 
 Devuelve los ```extra_content``` asociados al post/page filtrando por mas de una ```key```
 
 ```
@@ -216,7 +216,7 @@ Devuelve los ```extra_content``` asociados al post/page filtrando por mas de una
 ```
 
 
-## extract [¶](djblog#markdown-header-extract)
+## extract 
 Devuelve el contenido del post/page partido por el ```splitter```
 
 ```
@@ -225,7 +225,7 @@ Devuelve el contenido del post/page partido por el ```splitter```
 ```
 
 
-## has_category [¶](djblog#markdown-header-has_category)
+## has_category 
 Retorna ```True``` si la categoría está asociada al post/page
 
 ```
