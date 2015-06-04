@@ -252,6 +252,9 @@ class Post(CustomTemplate, BaseModel, ContentModel):
         # usa la funcion create_new_slug para evitar duplicacion a la hora de corregir el slug
         if not self.slug:
             self.slug = self.create_new_slug()
+
+        #if not self.content:
+        #    self.content = self.content_rendered
         # auto-genera los meta
         if not self.meta_description or self.meta_description != self.content.replace('"',''):
             self.meta_description = self.content.replace('"','')
@@ -322,14 +325,16 @@ class Post(CustomTemplate, BaseModel, ContentModel):
     def get_first_paragraph(self):
         parsed_content = self.parse_content()
 
-        if not isinstance(parsed_content, collections.Iterable) and isinstance(parsed_content, basestring):
+        if not isinstance(parsed_content, collections.Iterable) \
+                and isinstance(parsed_content, basestring):
             extract = parsed_content.split('<!--more-->')
             return extract[0]
-
-        for row in parsed_content:
-            for obj in row:
-                if obj['type'] == 'p':
-                    return obj
+ 
+        elif isinstance(parsed_content, collections.Iterable):
+            for row in parsed_content:
+                for obj in row:
+                    if obj['type'] == 'p':
+                        return obj
 
         return ""
     first_paragraph = property(get_first_paragraph)

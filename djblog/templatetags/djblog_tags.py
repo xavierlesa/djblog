@@ -177,7 +177,7 @@ def post_extract(context, splitter='<!--more-->', tag_link='<a href="%s">Leer m&
 
     # Usa el content texto plano
     else:
-        data = obj.content
+        data = obj.content_rendered
 
     data = extract(data, splitter)[0]
 
