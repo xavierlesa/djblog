@@ -221,7 +221,7 @@ def post_content(context, is_markdown=False, *args, **kwargs):
         tpl = Template(obj.custom_template)
 
     elif obj.template_name:
-        default_template.push(obj.template_name)
+        default_template.append(obj.template_name)
         tpl = loader.select_template(default_template)
 
     else:
