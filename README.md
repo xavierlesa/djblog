@@ -26,14 +26,15 @@ Es posible limitar la cantidad de caracteres pasando el argumento limit.
 Devuelve la imagen principal asociada al post/page
 
 ```
-{% post_image [size=[320x200|thumbnail|gallery] attrs="class='thumb'"] %}
+{% post_image [size=[320x200|thumbnail|gallery] [attrs="class='thumb'" [gallery_only=True [thumbnail_only=True]]]] %}
 ```
 
 No tiene ningún argumento obligatorio, pero si es posible modificar el tamaño y los atributos del tag.
 
 **size**: ```thumbnail``` y ```gallery``` son valores predefinidos pero sino puede ser seteado con width x height, así ```320x200```.
-
 **attrs**: Son pasados cómo vienen al tag ```<img src=... %(attrs)s/>```
+**gallery_only**: Determina si solo usa la imagen tildada como ```gallery_only```
+**thumbnail_only**: Determina si solo usa la imagen tildada como ```thumbnail_only```
 
 
 ### post_extract ###
@@ -46,10 +47,10 @@ Genera el extracto a partir del contenido.
 Por defecto ```post_extract``` resuelve el ```object``` desde el contexto, pero es posible pasar uno desde los argumentos.
 
 ```
-{% post_extract object=post [limit=40 [limit_chars=200]] %}
+{% post_extract object=post [splitter='<!--more-->' [tag_link='<a href="%s">Leer m&aacute;s</a>' [limit=0 [limit_chars=0 [is_markdown=False [is_safe=False]]]]]] %}
 ```
 
-Por defecto limita a 30 palabras, pero es posible pasar los argumentos ```limit``` o ```limir_chars``` para controlar los límites.
+Busca primero en el copete si no existe pasa al content_rendered y limita por la cantidad de caracteres, o donde encentre el patron del ```splitter```.
 
 
 ### post_date ###

@@ -181,7 +181,10 @@ def post_extract(context, splitter='<!--more-->', tag_link='<a href="%s">Leer m&
     elif limit:
         return truncatewords(data, limit)
 
-    post_link = tag_link % obj.get_absolute_url()
+    if tag_link:
+        post_link = tag_link % obj.get_absolute_url()
+    else:
+        post_link = ''
 
     return u"%s %s" % (data, post_link)
 
