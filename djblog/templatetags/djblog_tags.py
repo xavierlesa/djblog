@@ -161,10 +161,21 @@ def post_extract(context, splitter='<!--more-->', tag_link='<a href="%s">Leer m&
     if not obj:
         return ''
 
+    # Sí existe el copete es usado para el extracto
     if obj.copete:
         data = obj.copete
-    elif obj.first_paragraph and obj.first_paragraph.get('content'):
-        data = obj.first_paragraph['content']
+
+    # Busca si tiene paragraph
+    elif obj.first_paragraph:
+
+        if obj.first_paragraph.has_key('content'):
+            data = obj.first_paragraph['content']
+
+        # Usa el paragraph como biene
+        else:
+            data = obj.first_paragraph
+
+    # Usa el content texto plano
     else:
         data = obj.content
 
