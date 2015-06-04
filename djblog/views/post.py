@@ -89,6 +89,10 @@ class PostDateDetailView(PostDateBase, DateDetailView):
         ))
 
         templates.extend(names)
+
+        if self.object.template_name:
+            templates.insert(0, self.object.template_name)
+
         logger.debug('Loading theses templates names: \n%s', "\n".join(templates))
         return templates
 
@@ -375,6 +379,10 @@ class PostDetailView(PostBase, DetailView):
         ))
        
         templates.extend(names)
+
+        if self.object.template_name:
+            templates.insert(0, self.object.template_name)
+
         logger.debug('Loading theses templates names: \n%s', "\n".join(templates))
         return templates
 
@@ -452,6 +460,10 @@ class GenericPostDetailView(PostBase, DetailView):
         ))
        
         templates.extend(names)
+
+        if self.object.template_name:
+            templates.insert(0, self.object.template_name)
+
         logger.debug('Loading theses templates names: \n%s', "\n".join(templates))
         return templates
 

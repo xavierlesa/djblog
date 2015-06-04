@@ -70,6 +70,10 @@ class PageDetailView(PageBase, DetailView):
         ))
 
         templates.extend(names)
+
+        if self.object.template_name:
+            templates.insert(0, self.object.template_name)
+
         logger.debug('Loading theses templates names: \n%s', "\n".join(templates))
         return templates
 
@@ -155,6 +159,10 @@ class PageHierarchyDetailView(PageBase, DetailView):
 
         templates.extend(r)
         templates.extend(names)
+
+        if self.object.template_name:
+            templates.insert(0, self.object.template_name)
+
         logger.debug('Loading theses templates names: \n%s', "\n".join(templates))
         return templates
 
