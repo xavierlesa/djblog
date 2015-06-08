@@ -163,7 +163,7 @@ Retorna todos los `tags` acumulados
 ```
 
 
-## get_post_for_posttype
+## get_post_for_post_type
 Retorna un QuerySet filtrando el `post_type` del argumento o el mismo post_type del contexto['object']
 
 ```
