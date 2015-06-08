@@ -163,6 +163,14 @@ Retorna todos los `tags` acumulados
 ```
 
 
+## get_post_for_posttype
+Retorna un QuerySet filtrando el `post_type` del argumento o el mismo post_type del contexto['object']
+
+```
+{% get_posts_from_post_type [post_type='post_type_slug'|post_type=<post_type_instance>] as object_list %}
+```
+
+
 # Filtros 
 
 ## post_video 
