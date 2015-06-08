@@ -1,5 +1,11 @@
 requests
 json
 urllib
+django-wysiwyg-redactor
+elasticsearch
+django-haystack
+mysqlclient
+pytz
 
 git+https://github.com/ninjaotoko/django-mediacontent.git
+git+https://github.com/ninjaotoko/django-tagembed.git
