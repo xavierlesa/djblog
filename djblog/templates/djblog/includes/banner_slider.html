@@ -1,6 +1,6 @@
 {% load static djblog_tags %}
 {% if object_list %}
-<ul class="{{ banner_slider_class }}" {% not banner_slider_attribs %}data-orbit data-options="slide_number:false; bullets:false; animation:slide; navigation_arrows:true; animation_speed:250;"{% else %}{{ banner_slider_attribs }}{% endif %}>
+<ul class="{{ banner_slider_class }}" {% if not banner_slider_attribs %}data-orbit data-options="slide_number:false; bullets:false; animation:slide; navigation_arrows:true; animation_speed:250;"{% else %}{{ banner_slider_attribs }}{% endif %}>
     {% for object in object_list %}
     <li>
         {% post_link extra_content_only=True as link %}
