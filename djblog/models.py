@@ -92,7 +92,7 @@ class Category(BaseModel, CategoryModel):
     @models.permalink
     def get_absolute_url(self):
         if self.blog_category:
-            return (u'post_category_list', (self.slug,))
+            return (u'blog_category_list', (self.slug,))
         else:
             return (u'page_category_list', (self.slug,))
 

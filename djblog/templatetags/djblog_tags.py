@@ -226,7 +226,7 @@ def post_content(context, is_markdown=False, *args, **kwargs):
     if not content:
         content = obj.content_rendered
 
-    default_template = ["djblog/tag/post_content.html"]
+    default_template = ["djblog/includes/post_content.html"]
 
     if obj.custom_template:
         tpl = Template(obj.custom_template)
