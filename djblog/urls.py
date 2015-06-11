@@ -106,6 +106,10 @@ urlpatterns += patterns('',
     url(r'^(?P<post_type_slug>[\w\-\_\.]+)/?$', 
         GenericPostListView.as_view(), 
         name='generic_post_list'),
+
+    url(r'^(?P<post_type_slug>[\w\-\_\.]+)/category/(?P<slug>[\w\-\_\.]+)/?$', 
+        GenericCategoryListView.as_view(), 
+        name='generic_category_list'),
 )
 
 

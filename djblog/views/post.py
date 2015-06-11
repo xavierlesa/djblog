@@ -550,3 +550,13 @@ class GenericPostListView(PostBase, ListView):
 
         self.post_type = context.get('post_type')
         return context
+
+
+class GenericCategoryListView(GenericPostListView):
+    """
+    Listado para un objecto generico por categoría /post_type_slug/category/category_slug/
+    """
+    def get_queryset(self):
+        qs = super(GenericCategoryListView, self).get_queryset()
+        category_slug = self.kwargs.get('slug', '')
+        return qs.filter(Q(category__slug=category_slug)|Q(category__parent__slug=category_slug)).distinct()
