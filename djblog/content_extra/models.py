@@ -8,7 +8,7 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.utils.encoding import force_unicode
 
 try:
@@ -34,7 +34,7 @@ class ExtraContentManager(models.Manager):
 class ExtraContent(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_pk = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey('content_type', 'object_pk')
+    content_object = GenericForeignKey('content_type', 'object_pk')
     
     key = models.SlugField(max_length=100)
     name = models.CharField(max_length=100)

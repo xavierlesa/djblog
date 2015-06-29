@@ -15,7 +15,7 @@ from django.db import models, IntegrityError
 from django.db.models.signals import m2m_changed
 from django.contrib.sites.models import Site
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import slugify, striptags, linebreaksbr, \
@@ -252,7 +252,7 @@ class CategoryModel(models.Model):
 class GenericRelationModel(models.Model):
     content_type = models.ForeignKey(ContentType, blank=True, null=True, verbose_name=_('content type'), related_name="content_type_set_for_%(class)s")
     object_pk = models.PositiveIntegerField(_('object PK'), blank=True, null=True)
-    content_object = generic.GenericForeignKey(ct_field="content_type", fk_field="object_pk")
+    content_object = GenericForeignKey(ct_field="content_type", fk_field="object_pk")
 
     objects = GenericRelationManager()
 
