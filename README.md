@@ -158,14 +158,17 @@ Retorna el contenido renderizado del post/page ```content_render```
 ### post_link ###
 Devuelve el un `dict` con la `url` y `attribs` de un objeto o la url absoluta.
 
-Sí tiene `extra_content` asociado con `key`='link' usa éste para generar la URL.
+Sí tiene `extra_content` asociado con `key`=`link` usa éste para generar la URL.
 Sí el flag extra_content_only es True, solo devuelve un link si éste está 
 asociado a `extra_content`.
 
-key=link,
-name:
-    url -> href
-    attribs -> atributos del tag A
+> `key` = *link*
+> `name` = *url*
+> `field` = *es interpretado como el href del link* ```<a href=...>```
+
+> `key` = *link*
+> `name` = *attribs*
+> `field` = *es interpretado como los atributos del link* ```<a ... attribs>```
 
 ```
 {% post_link [extra_content_only=False] %}
@@ -211,9 +214,10 @@ Retorna un ```post``` o ```page``` por ```slug``` o ```ID```
 {% get_post_or_page [id=23|slug=acerca-de] as object %}
 ```
 
-> Nuevo en v 0.2
 
 ### get_posts_from_post_type ###
+> Nuevo en v 0.2
+
 Retorna un QuerySet filtrando el `post_type` del argumento o el mismo post_type del `contexto['object']`
 
 ```
@@ -324,8 +328,9 @@ Retorna ```True``` si la categoría está asociada al post/page
 {{ object|has_category:'slug-of-category' }}
 ```
 
-> Nuevo en v0.2
 ### exclude_object ###
+> Nuevo en v0.2
+
 Excluye un `object` desde el `QuerySet` por su `ID`
 
 ```
