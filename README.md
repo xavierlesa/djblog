@@ -3,7 +3,7 @@ Django Blog
 
 App para crear contenido dinamico, como un blog
 
-# Instalación
+## Instalación
 
 ```
 pip install git+http://github.com/ninjaotoko/djblog
@@ -40,7 +40,7 @@ urlpatterns = [
 Ahora haces ```python manage.py migrate``` y listo!
 
 
-# URLs y Vistas que djblog trae de fábrica
+## URLs y Vistas que djblog trae de fábrica
 
 Por defecto djblog trae dos tipos de contenidos, los ```Post``` y las ```Page```
 estos objetos tiene una estructura un poco diferente de URLs en comparación con
@@ -48,48 +48,48 @@ las genéricas.
 
 ### Post URLs ###
 
-|URL name                   |URL formato                        |
-|---------------------------|-----------------------------------|
-|*blog_detail*              |/blog/<year>/<month>/<day>/<slug>/ |
-|*blog_year_list*           |/blog/<year>                       |
-|*blog_year_month_list*     |/blog/<year>/<month>               |
-|*blog_year_month_day_list* |/blog/<year>/<month>/<day>/        |
-|*blog_thisweek_list*       |/blog/thisweek/                    |
-|*blog_today_list*          |/blog/today/                       |
-|*blog_category_list*       |/blog/category/<slug>/             |
-|*blog_author_list*         |/blog/author/<slug>/               |
-|*blog_tag_list*            |/blog/tag/<slug>/                  |
-|*blog_canonical_detail*    |/blog/<slug>/                      |
-|*blog_latest_list*         |/blog/                             |
+|URL name                   |URL formato                          |
+|---------------------------|-------------------------------------|
+|*blog_detail*              |`/blog/<year>/<month>/<day>/<slug>/ `|
+|*blog_year_list*           |`/blog/<year>                       `|
+|*blog_year_month_list*     |`/blog/<year>/<month>               `|
+|*blog_year_month_day_list* |`/blog/<year>/<month>/<day>/        `|
+|*blog_thisweek_list*       |`/blog/thisweek/                    `|
+|*blog_today_list*          |`/blog/today/                       `|
+|*blog_category_list*       |`/blog/category/<slug>/             `|
+|*blog_author_list*         |`/blog/author/<slug>/               `|
+|*blog_tag_list*            |`/blog/tag/<slug>/                  `|
+|*blog_canonical_detail*    |`/blog/<slug>/                      `|
+|*blog_latest_list*         |`/blog/                             `|
 
 
 ### Page URLs ###
 
-|URL name                   |URL formato                            |
-|---------------------------|---------------------------------------|
-|*page_detail*              |/page/<slug>/                          |
-|*page_category_list*       |/page/category/<slug>/                 |
-|*page_hierarchy_detail*    |/page/<category_slug>/<hierarchy_slug>/|
+|URL name                   |URL formato                              |
+|---------------------------|-----------------------------------------|
+|*page_detail*              |`/page/<slug>/                          `|
+|*page_category_list*       |`/page/category/<slug>/                 `|
+|*page_hierarchy_detail*    |`/page/<category_slug>/<hierarchy_slug>/`|
     
 
 ### Objetos genéricos y búsqueda ###
 
-|URL name                   |URL formato                       |
-|---------------------------|----------------------------------|
-|**Search** (haystack)      |                                  |
-|*generic_post_detail*      |/<post_type_slug>/<slug>/         |
-|*generic_post_list*        |/<post_type_slug>/                |
-|*generic_category_list*    |/<post_type_slug>/category/<slug>/|
+|URL name                   |URL formato                         |
+|---------------------------|------------------------------------|
+|**Search** (haystack)      |                                    |
+|*generic_post_detail*      |`/<post_type_slug>/<slug>/         `|
+|*generic_post_list*        |`/<post_type_slug>/                `|
+|*generic_category_list*    |`/<post_type_slug>/category/<slug>/`|
 
 
 Sí ```haystack``` está instalado habilita la URL de búsqueda
 
-|URL name                   |URL formato            |
-|---------------------------|-----------------------|
-|*haystack_search*          |/buscar/?q=QUERY+PARAMS|
+|URL name                   |URL formato              |
+|---------------------------|-------------------------|
+|*haystack_search*          |`/buscar/?q=QUERY+PARAMS`|
 
 
-# Templatetags
+## Templatetags
 
 ### post_title ###
 Devuelve el título de un post/pagina
@@ -179,7 +179,7 @@ Devuelve el ```QuerySet``` de ```page``` para una categoría.
 Si se quiere incluir las categorías ```childs``` hay que agregar el argumento ```recursive=recursive```
 
 
-## get_posts_from_category 
+### get_posts_from_category ###
 Devuelve el ```QuerySet``` de ```post``` para una categoría.
 
 ```
@@ -189,7 +189,7 @@ Devuelve el ```QuerySet``` de ```post``` para una categoría.
 Si se quiere incluir las categorías ```childs``` hay que agregar el argumento ```recursive=recursive```
 
 
-## get_post_or_page 
+### get_post_or_page ###
 Retorna un ```post``` o ```page``` por ```slug``` o ```ID```
 
 ```
@@ -197,14 +197,14 @@ Retorna un ```post``` o ```page``` por ```slug``` o ```ID```
 ```
 
 
-## get_category 
+### get_category ###
 Retorna una ```category``` por ```slug```
 
 ```
 {% get_category slug='category-name' as object %}
 ```
 
-## get_all_categories 
+### get_all_categories ###
 
 ```
 {% get_all_categories [slug=category-name blog=False children=False recursive=False max_level=2] as object_list %}
@@ -225,14 +225,14 @@ flag `blog_category=True`.
 de 2 niveles por defecto, pero se puede ajustar desde `max_level`.
 
 
-## get_sub_categories 
+### get_sub_categories ###
 Retorna las ```category``` del post/page donde el ```parent``` es el ```slug``` del argumento.
 
 ```
 {% get_sub_categories slug=category-name as object_list %}
 ```
 
-## get_posts_for_tags 
+### get_posts_for_tags ###
 Filtra por `taxonomia` los `post` con los `tags` asociados
 
 ```
@@ -240,7 +240,7 @@ Filtra por `taxonomia` los `post` con los `tags` asociados
 ```
 
 
-## get_tags_list 
+### get_tags_list ###
 Retorna todos los `tags` acumulados
 
 ```
@@ -248,7 +248,7 @@ Retorna todos los `tags` acumulados
 ```
 
 
-## get_post_for_post_type
+### get_post_for_post_type ###
 Retorna un QuerySet filtrando el `post_type` del argumento o el mismo post_type del contexto['object']
 
 ```
@@ -256,9 +256,9 @@ Retorna un QuerySet filtrando el `post_type` del argumento o el mismo post_type 
 ```
 
 
-# Filtros 
+## Filtros 
 
-## post_video 
+### post_video ###
 Devuelve un video asociado, busca en ```extra_content``` si tiene un objeto con el ```key``` ```video```.
 En caso de no tener busca en las columnas del ```parse_content``` con el tipo ```video:youtube```
 
@@ -266,7 +266,7 @@ En caso de no tener busca en las columnas del ```parse_content``` con el tipo ``
 {{ object|post_video }}
 ```
 
-## get_post_extra_content_key_name 
+### get_post_extra_content_key_name ###
 Devuelve los ```extra_content``` asociados al post/page filtrando por ```key``` y ```name```
 
 ```
@@ -282,7 +282,7 @@ Devuelve los ```extra_content``` asociados al post/page filtrando por ```key```
 ```
 
 
-## get_post_extra_content_by_keys 
+### get_post_extra_content_by_keys ###
 Devuelve los ```extra_content``` asociados al post/page filtrando por mas de una ```key```
 
 ```
@@ -290,7 +290,7 @@ Devuelve los ```extra_content``` asociados al post/page filtrando por mas de una
 ```
 
 
-## extract 
+### extract ###
 Devuelve el contenido del post/page partido por el ```splitter```
 
 ```
@@ -298,7 +298,7 @@ Devuelve el contenido del post/page partido por el ```splitter```
 ```
 
 
-## has_category 
+### has_category ###
 Retorna ```True``` si la categoría está asociada al post/page
 
 ```
