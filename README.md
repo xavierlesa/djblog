@@ -117,8 +117,11 @@ Devuelve la imagen principal asociada al post/page
 No tiene ningún argumento obligatorio, pero si es posible modificar el tamaño y los atributos del tag.
 
 **size**: ```thumbnail``` y ```gallery``` son valores predefinidos pero sino puede ser seteado con width x height, así ```320x200```.
+
 **attrs**: Son pasados cómo vienen al tag ```<img src=... %(attrs)s/>```
+
 **gallery_only**: Determina si solo usa la imagen tildada como ```gallery_only```
+
 **thumbnail_only**: Determina si solo usa la imagen tildada como ```thumbnail_only```
 
 
@@ -162,13 +165,17 @@ Sí tiene `extra_content` asociado con `key`=`link` usa éste para generar la UR
 Sí el flag extra_content_only es True, solo devuelve un link si éste está 
 asociado a `extra_content`.
 
-> `key` = *link*
-> `name` = *url*
-> `field` = *es interpretado como el href del link* ```<a href=...>```
+```
+key = link
+name = url
+field = es interpretado como el href del link <a href=...>
 
-> `key` = *link*
-> `name` = *attribs*
-> `field` = *es interpretado como los atributos del link* ```<a ... attribs>```
+key = link
+name = attribs
+field = es interpretado como los atributos del link <a ... attribs>
+```
+
+Uso:
 
 ```
 {% post_link [extra_content_only=False] %}
