@@ -3,6 +3,91 @@ Django Blog
 
 App para crear contenido dinamico, como un blog
 
+# Instalación
+
+```
+pip install git+http://github.com/ninjaotoko/djblog
+```
+
+Luego agregar entre tus ```INSTALLED_APPS ```:
+
+```
+INSTALLED_APPS = (
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django.contrib.sites',
+    
+    'djblog',
+    ...
+    )
+```
+
+Y en tus ```urls.py```
+
+```
+urlpatterns = [
+    ...
+    url(r'^admin/', include(admin.site.urls)),
+    ...
+    url(r'', include('djblog.urls')),
+    ]
+```
+
+Ahora haces ```python manage.py migrate``` y listo!
+
+
+# URLs y Vistas que djblog trae de fábrica
+
+Por defecto djblog trae dos tipos de contenidos, los ```Post``` y las ```Page```
+estos objetos tiene una estructura un poco diferente de URLs en comparación con
+las genéricas.
+
+### Post URLs ###
+
+|URL name                   |URL formato                        |
+|---------------------------|-----------------------------------|
+|*blog_detail*              |/blog/<year>/<month>/<day>/<slug>/ |
+|*blog_year_list*           |/blog/<year>                       |
+|*blog_year_month_list*     |/blog/<year>/<month>               |
+|*blog_year_month_day_list* |/blog/<year>/<month>/<day>/        |
+|*blog_thisweek_list*       |/blog/thisweek/                    |
+|*blog_today_list*          |/blog/today/                       |
+|*blog_category_list*       |/blog/category/<slug>/             |
+|*blog_author_list*         |/blog/author/<slug>/               |
+|*blog_tag_list*            |/blog/tag/<slug>/                  |
+|*blog_canonical_detail*    |/blog/<slug>/                      |
+|*blog_latest_list*         |/blog/                             |
+
+
+### Page URLs ###
+
+|URL name                   |URL formato                            |
+|---------------------------|---------------------------------------|
+|*page_detail*              |/page/<slug>/                          |
+|*page_category_list*       |/page/category/<slug>/                 |
+|*page_hierarchy_detail*    |/page/<category_slug>/<hierarchy_slug>/|
+    
+
+### Objetos genéricos y búsqueda ###
+
+|URL name                   |URL formato                       |
+|---------------------------|----------------------------------|
+|**Search** (haystack)      |                                  |
+|*generic_post_detail*      |/<post_type_slug>/<slug>/         |
+|*generic_post_list*        |/<post_type_slug>/                |
+|*generic_category_list*    |/<post_type_slug>/category/<slug>/|
+
+
+Sí ```haystack``` está instalado habilita la URL de búsqueda
+
+|URL name                   |URL formato            |
+|---------------------------|-----------------------|
+|*haystack_search*          |/buscar/?q=QUERY+PARAMS|
+
 
 # Templatetags
 
