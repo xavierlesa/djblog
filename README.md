@@ -155,6 +155,21 @@ Retorna el contenido renderizado del post/page ```content_render```
 {% post_content %}
 ```
 
+### post_link ###
+Devuelve el un `dict` con la `url` y `attribs` de un objeto o la url absoluta.
+
+Sí tiene `extra_content` asociado con `key`='link' usa éste para generar la URL.
+Sí el flag extra_content_only es True, solo devuelve un link si éste está 
+asociado a `extra_content`.
+
+key=link,
+name:
+    url -> href
+    attribs -> atributos del tag A
+
+```
+{% post_link [extra_content_only=False] %}
+```
 
 ### post_archive ###
 Retorna un ```QuerySet``` con el "Archivo" de los post/page por meses.
@@ -196,6 +211,14 @@ Retorna un ```post``` o ```page``` por ```slug``` o ```ID```
 {% get_post_or_page [id=23|slug=acerca-de] as object %}
 ```
 
+> Nuevo en v 0.2
+
+### get_posts_from_post_type ###
+Retorna un QuerySet filtrando el `post_type` del argumento o el mismo post_type del `contexto['object']`
+
+```
+{% get_posts_from_post_type [post_type='post_type_slug'|post_type=<post_type_instance>] as object_list %}
+```
 
 ### get_category ###
 Retorna una ```category``` por ```slug```
@@ -248,17 +271,13 @@ Retorna todos los `tags` acumulados
 ```
 
 
-### get_post_for_post_type ###
-Retorna un QuerySet filtrando el `post_type` del argumento o el mismo post_type del contexto['object']
-
-```
-{% get_posts_from_post_type [post_type='post_type_slug'|post_type=<post_type_instance>] as object_list %}
-```
-
-
 ## Filtros 
 
 ### post_video ###
+
+> Warning: Este filtro está deprecated hay que usar post_embed y usar tagembed para
+> resolver los embeds
+
 Devuelve un video asociado, busca en ```extra_content``` si tiene un objeto con el ```key``` ```video```.
 En caso de no tener busca en las columnas del ```parse_content``` con el tipo ```video:youtube```
 
@@ -303,4 +322,12 @@ Retorna ```True``` si la categoría está asociada al post/page
 
 ```
 {{ object|has_category:'slug-of-category' }}
+```
+
+> Nuevo en v0.2
+### exclude_object ###
+Excluye un `object` desde el `QuerySet` por su `ID`
+
+```
+{{ object_list|exclude_object:object }}
 ```

@@ -311,28 +311,6 @@ def post_archive(*args, **kwargs):
     return Post.objects.get_blog_posts().dates('publication_date', 'month')
     
 
-# TODO: este filtro está deprecated hay que usar post_embed y usar tagembed para
-# resolver los embeds
-@register.filter
-def post_video(obj, key=None):
-    try:
-        vid = obj.get_extra_content().filter(key='video')[0]
-        ret = json.loads(vid.field)
-        if key:
-            ret = ret[key]
-        return ret
-    except:
-        try:
-            parsed_content = obj.parse_content()
-            if parsed_content:
-                for row in parsed_content:
-                    for obj in row:
-                        if obj['type'] == 'video:youtube':
-                            return obj['content']
-        except:
-            pass
-    return ''
-
 @register.assignment_tag
 def get_pages_from_category(cat, recursive=None):
     """
@@ -407,36 +385,6 @@ def get_posts_from_post_type(context, post_type=''):
 
     return qs
 
-@register.filter
-def get_post_extra_content_key_name(obj, key_name=None):
-    """
-    Devuelve los extra_content asociados al post/page filtrando por key y name
-    {{ object|get_post_extra_content_key_name:'pdf:attached' }}
-    """
-    if obj:
-        key, name = key_name.split(',')
-        return obj.get_extra_content().filter(key__iexact=key, name__iexact=name)
-    return ''
-
-
-@register.filter
-def get_post_extra_content_key(obj, key_name=None):
-    """
-    Devuelve los extra_content asociados al post/page filtrando por key
-    {{ object|get_post_extra_content_key:'pdf' }}
-    """
-    return obj.get_extra_content().filter(key__iexact=key_name)
-
-
-@register.filter
-def get_post_extra_content_by_keys(obj, keys=None):
-    """
-    Devuelve los extra_content asociados al post/page filtrando por mas de una key
-    {{ object|get_post_extra_content_by_keys:'pdf,doc,txt' }}    
-    """
-    key = keys.split(',')
-    return obj.get_extra_content().filter(key__in__iexact=key)
-
 
 @register.assignment_tag
 def get_category(slug):
@@ -496,15 +444,6 @@ def get_sub_categories(context, slug):
 
 
 @register.assignment_tag
-def get_tags_list(*args, **kwargs):
-    """
-    Retorna todos los `tags` acumulados 
-    {% get_tags_list as object_list %}
-    """
-    return Tag.objects.active()
-
-
-@register.assignment_tag
 def get_posts_for_tags(slug=None, id=None, *args, **kwargs):
     """
     Filtra por `taxonomia` los `post` con los `tags` asociados
@@ -523,12 +462,75 @@ def get_posts_for_tags(slug=None, id=None, *args, **kwargs):
     return qs
 
 
+@register.assignment_tag
 def get_tags_list(*args, **kwargs):
     """
     Retorna todos los `tags` acumulados 
     {% get_tags_list as object_list %}
     """
     return Tag.objects.active()
+
+
+def get_tags_list(*args, **kwargs):
+    """
+    Retorna todos los `tags` acumulados 
+    {% get_tags_list as object_list %}
+    """
+    return Tag.objects.active()
+
+
+# FILTROS
+
+# TODO: este filtro está deprecated hay que usar post_embed y usar tagembed para
+# resolver los embeds
+@register.filter
+def post_video(obj, key=None):
+    try:
+        vid = obj.get_extra_content().filter(key='video')[0]
+        ret = json.loads(vid.field)
+        if key:
+            ret = ret[key]
+        return ret
+    except:
+        try:
+            parsed_content = obj.parse_content()
+            if parsed_content:
+                for row in parsed_content:
+                    for obj in row:
+                        if obj['type'] == 'video:youtube':
+                            return obj['content']
+        except:
+            pass
+    return ''
+
+@register.filter
+def get_post_extra_content_key_name(obj, key_name=None):
+    """
+    Devuelve los extra_content asociados al post/page filtrando por key y name
+    {{ object|get_post_extra_content_key_name:'pdf:attached' }}
+    """
+    if obj:
+        key, name = key_name.split(',')
+        return obj.get_extra_content().filter(key__iexact=key, name__iexact=name)
+    return ''
+
+@register.filter
+def get_post_extra_content_key(obj, key_name=None):
+    """
+    Devuelve los extra_content asociados al post/page filtrando por key
+    {{ object|get_post_extra_content_key:'pdf' }}
+    """
+    return obj.get_extra_content().filter(key__iexact=key_name)
+
+
+@register.filter
+def get_post_extra_content_by_keys(obj, keys=None):
+    """
+    Devuelve los extra_content asociados al post/page filtrando por mas de una key
+    {{ object|get_post_extra_content_by_keys:'pdf,doc,txt' }}    
+    """
+    key = keys.split(',')
+    return obj.get_extra_content().filter(key__in__iexact=key)
 
 
 @register.filter
@@ -561,6 +563,10 @@ def has_category(obj, cat):
 
 @register.filter
 def exclude_object(qs, obj):
+    """
+    Excluye un `object` desde el `QuerySet` por su `ID`
+    {{ object_list|exclude_object:object }}
+    """
     return qs.exclude(pk=obj.pk)
 
 
