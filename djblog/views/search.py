@@ -14,4 +14,4 @@ from djblog.models import Post
 class CustomSearchView(SearchView):
     def __init__(self, *args, **kwargs):
         super(CustomSearchView, self).__init__(*args, **kwargs)
-        self.searchqueryset = SearchQuerySet().models(Post).filter(is_page=0)
+        self.searchqueryset = SearchQuerySet().models(Post)
