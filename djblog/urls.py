@@ -11,7 +11,8 @@ from djblog.views.page import *
 
 
 urlpatterns = patterns('',
-        )
+    url(r'^$', PageDetailView.as_view(), kwargs=dict(slug="home"), name='home'),
+)
 
 # Haystack config
 if 'haystack' in getattr(settings, 'INSTALLED_APPS', []):
