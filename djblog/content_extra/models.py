@@ -10,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.utils.encoding import force_unicode
+from django.template.defaultfilters import striptags
 
 try:
     import json
@@ -38,7 +39,11 @@ class ExtraContent(models.Model):
     
     key = models.SlugField(max_length=100)
     name = models.CharField(max_length=100)
-    field = models.TextField()
+    text_field = models.TextField()
+    rich_field = models.BooleanField(default=False, blank=True, 
+            help_text=_(u"Este estado determina si se mostrara como texto enriquecido o plano"))
+
+    #field = models.TextField()
     #fieldtype = models.CharField(max_length=20, choices=FIELD_TYPE)
 
     
@@ -63,3 +68,9 @@ class ExtraContent(models.Model):
 
     class API:
         exclude = ('object_pk', 'content_type', 'content_object')
+
+    @property
+    def field(self):
+        if self.rich_field:
+            return self.text_field
+        return striptags(self.text_field)
