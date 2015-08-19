@@ -117,7 +117,7 @@ class BaseAdmin(MultiSiteBaseAdmin):
 
 
 def export_selected(modeladmin, request, queryset):
-    app, module, fields = modeladmin.model._meta.app_label, modeladmin.model._meta.module_name, modeladmin.model._meta.fields
+    app, module, fields = modeladmin.model._meta.app_label, modeladmin.model._meta.model_name, modeladmin.model._meta.fields
     qs = queryset
     csv_data = "\t".join([u"%s" % f.name for f in fields]) + "\r\n"
 
