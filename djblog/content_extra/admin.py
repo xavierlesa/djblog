@@ -2,7 +2,7 @@ from django import forms
 from django.db import models
 from django.contrib.contenttypes.admin import GenericStackedInline
 from djblog.content_extra.models import ExtraContent
-
+from redactor.widgets import RedactorEditor
 
 class ExtraContentInline(GenericStackedInline):
     model = ExtraContent
@@ -22,3 +22,7 @@ class ExtraContentInline(GenericStackedInline):
         }),
     )
     """
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        if db_field.name == 'text_field':
+            kwargs['widget'] = RedactorEditor()
+        return super(ExtraContentInline,self).formfield_for_dbfield(db_field,**kwargs)
