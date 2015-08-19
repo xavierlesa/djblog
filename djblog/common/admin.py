@@ -124,7 +124,7 @@ def export_selected(modeladmin, request, queryset):
     for data in qs:
         csv_data = csv_data + "\t".join([u"%s" % d for d in [getattr(data, f.name) for f in fields]]) + "\r\n"
 
-    response = HttpResponse(csv_data, mimetype='application/vnd.ms-excel')
+    response = HttpResponse(csv_data, content_type='application/vnd.ms-excel')
     response['Content-Disposition'] = "attachment; filename=%s-%s.xls" % (app, module) 
 
     return response
