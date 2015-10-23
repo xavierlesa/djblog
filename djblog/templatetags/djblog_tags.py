@@ -119,7 +119,7 @@ def post_image(context, *args, **kwargs):
         except IOError:
             try:
                 image = Image.open(img.content.path)
-                thumb = ImageOps.fit(image, [int(x) for x in size.split('x')], 0, Image.ANTIALIAS, (0.5, 0.0))
+                thumb = ImageOps.fit(image, [int(x) for x in size.split('x')], Image.ANTIALIAS, 0, (0.5, 0.0))
                 thumb.save(crop_path, 'JPEG', quality=90)
             except IOError:
                 img_alt = "imagen no disponible"
