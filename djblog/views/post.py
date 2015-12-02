@@ -565,3 +565,19 @@ class GenericCategoryListView(GenericPostListView):
         qs = super(GenericCategoryListView, self).get_queryset()
         category_slug = self.kwargs.get('slug', '')
         return qs.filter(Q(category__slug=category_slug)|Q(category__parent__slug=category_slug)).distinct()
+
+    def get_context_data(self, **kwargs):
+        """
+        Agrega al `context` la `category`
+        """
+
+        category_slug = self.kwargs.get('slug', '')
+        context = super(GenericCategoryListView, self).get_context_data(**kwargs)
+        try:
+            context['category'] = Category.objects.get(slug=category_slug)
+        except (Category.DoesNotExist, Category.MultipleObjectsReturned):
+            logger.debug("Category %s DoesNotExist or MultipleObjectsReturned", category_slug)
+            pass
+
+        self.category = context.get('category')
+        return context
