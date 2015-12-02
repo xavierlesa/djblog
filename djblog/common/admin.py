@@ -98,7 +98,7 @@ class BaseAdmin(MultiSiteBaseAdmin):
                     'pub_date', 
                     'is_active', 
                     'is_live', 
-                    'lang',
+                    #'lang',
                     ),
                 'classes': (
                     'collapse',
