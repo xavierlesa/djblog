@@ -399,7 +399,7 @@ def get_category(slug):
     return ''
 
 @register.assignment_tag
-def get_all_categories(slug=None, blog=False, children=False, recursive=False, max_level=2):
+def get_all_categories(slug=None, blog=None, children=False, recursive=False, max_level=2):
     """
     Retorna el `QuerySet` de Category según algunos filtros.
     Si el `slug` está presente filtra por aquellas `Category` que tengan como
@@ -426,8 +426,11 @@ def get_all_categories(slug=None, blog=False, children=False, recursive=False, m
                 
         qs = qs.filter(query)
     
-    if blog:
+    if blog is True:
         qs = qs.filter(blog_category=True)
+    elif blog is False:
+        qs = qs.filter(blog_category=False)
+
     
     return qs
 
