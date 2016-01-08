@@ -32,14 +32,14 @@ __ALL__ = ('MultiSiteBaseModel', 'BaseModel', 'ContentModel', 'CategoryModel', \
 if 'django.core.context_processors.i18n' not in settings.TEMPLATE_CONTEXT_PROCESSORS:
     settings.TEMPLATE_CONTEXT_PROCESSORS = settings.TEMPLATE_CONTEXT_PROCESSORS + ('django.core.context_processors.i18n', 'djblog.context_processors.site')
 if getattr(settings, 'TEMPLATES', False) and len(settings.TEMPLATES): # Django 1.8
-    if 'django.template.context_processors.i18n' not in settings.TEMPLATES[0]['OPTIONS']:
-        settings.TEMPLATES[0]['OPTIONS'] = settings.TEMPLATES[0]['OPTIONS'] + ('django.template.context_processors.i18n',)
+    if 'django.template.context_processors.i18n' not in settings.TEMPLATES[0]['OPTIONS']['context_processors']:
+        settings.TEMPLATES[0]['OPTIONS']['context_processors'] = settings.TEMPLATES[0]['OPTIONS']['context_processors'] + ['django.template.context_processors.i18n',]
 
 if 'djblog.context_processors.site' not in settings.TEMPLATE_CONTEXT_PROCESSORS:
     settings.TEMPLATE_CONTEXT_PROCESSORS = settings.TEMPLATE_CONTEXT_PROCESSORS + ('djblog.context_processors.site',)
 if getattr(settings, 'TEMPLATES', False) and len(settings.TEMPLATES): # Django 1.8
-    if 'djblog.context_processors.site' not in settings.TEMPLATES[0]['OPTIONS']:
-        settings.TEMPLATES[0]['OPTIONS'] = settings.TEMPLATES[0]['OPTIONS'] + ('djblog.context_processors.site',)
+    if 'djblog.context_processors.site' not in settings.TEMPLATES[0]['OPTIONS']['context_processors']:
+        settings.TEMPLATES[0]['OPTIONS']['context_processors'] = settings.TEMPLATES[0]['OPTIONS']['context_processors'] + ['djblog.context_processors.site',]
 
 class MultiSiteBaseModel(models.Model):
     """
