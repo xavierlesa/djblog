@@ -51,7 +51,7 @@ class Tag(BaseModel):
 
     @models.permalink
     def get_absolute_url(self):
-        return (u'post_tag_list', (self.slug,))
+        return (u'blog_tag_list', (self.slug,))
 
     class Meta:
         ordering = ('name',)

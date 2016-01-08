@@ -98,7 +98,7 @@ class BaseAdmin(MultiSiteBaseAdmin):
                     'pub_date', 
                     'is_active', 
                     'is_live', 
-                    'lang',
+                    #'lang',
                     ),
                 'classes': (
                     'collapse',
@@ -117,14 +117,14 @@ class BaseAdmin(MultiSiteBaseAdmin):
 
 
 def export_selected(modeladmin, request, queryset):
-    app, module, fields = modeladmin.model._meta.app_label, modeladmin.model._meta.module_name, modeladmin.model._meta.fields
+    app, module, fields = modeladmin.model._meta.app_label, modeladmin.model._meta.model_name, modeladmin.model._meta.fields
     qs = queryset
     csv_data = "\t".join([u"%s" % f.name for f in fields]) + "\r\n"
 
     for data in qs:
         csv_data = csv_data + "\t".join([u"%s" % d for d in [getattr(data, f.name) for f in fields]]) + "\r\n"
 
-    response = HttpResponse(csv_data, mimetype='application/vnd.ms-excel')
+    response = HttpResponse(csv_data, content_type='application/vnd.ms-excel')
     response['Content-Disposition'] = "attachment; filename=%s-%s.xls" % (app, module) 
 
     return response

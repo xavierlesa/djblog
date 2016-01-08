@@ -119,7 +119,7 @@ def post_image(context, *args, **kwargs):
         except IOError:
             try:
                 image = Image.open(img.content.path)
-                thumb = ImageOps.fit(image, [int(x) for x in size.split('x')], 0, Image.ANTIALIAS, (0.5, 0.0))
+                thumb = ImageOps.fit(image, [int(x) for x in size.split('x')], Image.ANTIALIAS, 0, (0.5, 0.0))
                 thumb.save(crop_path, 'JPEG', quality=90)
             except IOError:
                 img_alt = "imagen no disponible"
@@ -399,7 +399,7 @@ def get_category(slug):
     return ''
 
 @register.assignment_tag
-def get_all_categories(slug=None, blog=False, children=False, recursive=False, max_level=2):
+def get_all_categories(slug=None, blog=None, children=False, recursive=False, max_level=2):
     """
     Retorna el `QuerySet` de Category según algunos filtros.
     Si el `slug` está presente filtra por aquellas `Category` que tengan como
@@ -426,8 +426,11 @@ def get_all_categories(slug=None, blog=False, children=False, recursive=False, m
                 
         qs = qs.filter(query)
     
-    if blog:
+    if blog is True:
         qs = qs.filter(blog_category=True)
+    elif blog is False:
+        qs = qs.filter(blog_category=False)
+
     
     return qs
 

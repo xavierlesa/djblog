@@ -162,7 +162,7 @@ Retorna el contenido renderizado del post/page ```content_render```
 Devuelve el un `dict` con la `url` y `attribs` de un objeto o la url absoluta.
 
 Sí tiene `extra_content` asociado con `key`=`link` usa éste para generar la URL.
-Sí el flag extra_content_only es True, solo devuelve un link si éste está 
+Sí el flag `extra_content_only` es `True`, solo devuelve un link si éste está 
 asociado a `extra_content`.
 
 ```

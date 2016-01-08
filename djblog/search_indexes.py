@@ -24,4 +24,4 @@ class PostIndex(indexes.SearchIndex, indexes.Indexable):
         return Post
 
     def prepare_post_type(self, post):
-        return post.post_type.post_type_slug
+        return post.post_type.slug
