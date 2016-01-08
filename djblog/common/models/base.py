@@ -32,6 +32,9 @@ __ALL__ = ('MultiSiteBaseModel', 'BaseModel', 'ContentModel', 'CategoryModel', \
 if 'django.core.context_processors.i18n' not in settings.TEMPLATE_CONTEXT_PROCESSORS:
     settings.TEMPLATE_CONTEXT_PROCESSORS = settings.TEMPLATE_CONTEXT_PROCESSORS + ('django.core.context_processors.i18n', 'djblog.context_processors.site')
 
+if 'djblog.context_processors.site' not in settings.TEMPLATE_CONTEXT_PROCESSORS:
+    settings.TEMPLATE_CONTEXT_PROCESSORS = settings.TEMPLATE_CONTEXT_PROCESSORS + ('djblog.context_processors.site',)
+
 class MultiSiteBaseModel(models.Model):
     """
     Base para Multi Site y Lang
