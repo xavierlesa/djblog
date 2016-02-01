@@ -162,6 +162,14 @@ class PostType(CustomTemplate, BaseModel):
             'post_type_slug': self.post_type_slug, 
             })
 
+    def get_media_content(self):
+        return MediaContent.objects.get_for_model(self)
+    media_content = property(get_media_content)
+
+    def get_extra_content(self, *args, **kwargs):
+        return ExtraContent.objects.get_for_model(self)
+    extra_content = property(get_extra_content)
+
 
 class Post(CustomTemplate, BaseModel, ContentModel):
     """

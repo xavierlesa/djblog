@@ -81,6 +81,11 @@ class PostTypeAdmin(BaseAdmin):
                 }),
             )
 
+    inlines = [
+            MediaContentInline, 
+            ExtraContentInline
+            ]
+
 
 class PostAdmin(BaseAdmin):
     form = PostAdminForm
