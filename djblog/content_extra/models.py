@@ -42,15 +42,14 @@ class ExtraContent(models.Model):
     text_field = models.TextField()
     rich_field = models.BooleanField(default=False, blank=True, 
             help_text=_(u"Este estado determina si se mostrara como texto enriquecido o plano"))
-
-    #field = models.TextField()
-    #fieldtype = models.CharField(max_length=20, choices=FIELD_TYPE)
-
+    sort_order = models.PositiveIntegerField(_(u'Orden'),default=1) 
     
     objects = ExtraContentManager()
 
     class Meta:
         app_label = 'djblog'
+        ordering = ('sort_order',)
+
 
     def __unicode__(self):
         return self.key
