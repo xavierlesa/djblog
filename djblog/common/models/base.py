@@ -9,6 +9,8 @@ Author: Xavier Lesa <xavierlesa@gmail.com>
 """
 
 import re
+import django
+
 from datetime import datetime
 from django.conf import settings
 from django.db import models, IntegrityError
@@ -30,7 +32,12 @@ __ALL__ = ('MultiSiteBaseModel', 'BaseModel', 'ContentModel', 'CategoryModel', \
         'GenericRelationModel', CONTENT_PREVIEW_WORDS)
 
 if 'django.core.context_processors.i18n' not in settings.TEMPLATE_CONTEXT_PROCESSORS:
-    settings.TEMPLATE_CONTEXT_PROCESSORS = settings.TEMPLATE_CONTEXT_PROCESSORS + ('django.core.context_processors.i18n', 'djblog.context_processors.site')
+    # check django version and add the TEMPLATE_CONTEXT_PROCESSORS in the correct data type
+    if django.get_version() < '1.9':
+        settings.TEMPLATE_CONTEXT_PROCESSORS = settings.TEMPLATE_CONTEXT_PROCESSORS + ('django.core.context_processors.i18n', 'djblog.context_processors.site')
+    else:
+        settings.TEMPLATE_CONTEXT_PROCESSORS = settings.TEMPLATE_CONTEXT_PROCESSORS + ['django.core.context_processors.i18n', 'djblog.context_processors.site']
+
 if getattr(settings, 'TEMPLATES', False) and len(settings.TEMPLATES): # Django 1.8
     if 'django.template.context_processors.i18n' not in settings.TEMPLATES[0]['OPTIONS']['context_processors']:
         settings.TEMPLATES[0]['OPTIONS']['context_processors'] = settings.TEMPLATES[0]['OPTIONS']['context_processors'] + ['django.template.context_processors.i18n',]
