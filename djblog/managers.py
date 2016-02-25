@@ -119,4 +119,15 @@ class PostManager(BaseManager):
         """
         filtra el blog y las páginas para devolver los objetos genéricos
         """
-        return self.public(*args, **kwargs).exclude(post_type__post_type_slug__in=['blog', 'page'])
+        EXCLUDED_SLUGS = ['blog', 'page']
+        post_type = kwargs.pop("post_type", None)
+
+        if post_type:
+            if post_type.post_type_slug in EXCLUDED_SLUGS:
+                EXCLUDED_SLUGS.remove(post_type.post_type_slug)
+        
+        qs = self.public(*args, **kwargs).exclude(post_type__post_type_slug__in=EXCLUDED_SLUGS)
+        if post_type:
+            qs = qs.filter(post_type=post_type)
+
+        return qs

@@ -503,7 +503,7 @@ class GenericPostListView(PostBase, ListView):
 
         if self.request.user.is_staff:
             return Post.objects.get_for_lang().filter(post_type=post_type)
-        return Post.objects.get_generic_posts().filter(post_type=post_type)
+        return Post.objects.get_generic_posts(post_type=post_type)
 
     def get_template_names(self):
         names = super(GenericPostListView, self).get_template_names()
