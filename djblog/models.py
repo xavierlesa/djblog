@@ -194,6 +194,7 @@ class Post(CustomTemplate, BaseModel, ContentModel):
     user = models.ForeignKey(User, blank=True, null=True)
     author = models.ForeignKey(User, related_name='author', blank=True, null=True)
     status = models.ForeignKey(Status, blank=True, null=True)
+    sort_order = models.PositiveIntegerField(_(u'Orden'),default=1) 
 
     tags = models.ManyToManyField(Tag, blank=True, help_text=_(u"Tags descriptívos"))
 
@@ -215,7 +216,7 @@ class Post(CustomTemplate, BaseModel, ContentModel):
 
     class Meta:
         get_latest_by = 'publication_date'
-        ordering = ('-publication_date', 'title')
+        ordering = ('-sort_order', '-publication_date', 'title')
         verbose_name_plural = _(u"Posts")
         verbose_name = _(u"Post")
 

@@ -168,6 +168,7 @@ class PostAdmin(BaseAdmin):
                         'content_rendered', 
                         'category', 
                         (
+                            'sort_order',
                             'post_type',
                             'status', 
                             'author'
@@ -203,6 +204,7 @@ class PostAdmin(BaseAdmin):
                         'content_rendered', 
                         'category', 
                         (
+                            'sort_order',
                             'post_type',
                             'status', 
                             'author'
