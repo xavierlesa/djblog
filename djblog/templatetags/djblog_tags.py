@@ -88,10 +88,14 @@ def post_image(context, *args, **kwargs):
         iqs = obj.media_content.get_thumbnail()
         if iqs.exists():
             img = iqs[0]
+    elif kwargs.has_key('no_thumbnail'):
+        img = obj.media_content.exclude(thumbnail_only=True).first()
     elif kwargs.has_key('gallery_only'):
         iqs = obj.media_content.get_gallery()
         if iqs.exists():
             img = iqs[0]
+    elif kwargs.has_key('no_gallery'):
+        img = obj.media_content.exclude(gallery_only=True).first()
     else:
         img = obj.get_first_image()
 
