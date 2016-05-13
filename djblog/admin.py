@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from mediacontent.admin import MediaContentInline
-from djblog.models import Post, PostType, Category, Status, Tag
+from djblog.models import Post, PostType, Category, Status, Tag, CategoryRelationship
 #from djblog.forms import PostAdminForm
 from djblog.content_extra.admin import ExtraContentInline
 from djblog.common.admin import BaseAdmin
@@ -304,11 +304,14 @@ class PostAdmin(BaseAdmin):
     mark_inactive.short_description = _(u'Mark select articles as inactive')
 
 
+class CategoryRelationshipInline(admin.TabularInline):
+    model = CategoryRelationship
+    fk_name = 'from_category'
+    extra = 2 # how many rows to show
 
 class CategoryAdmin(BaseAdmin):
     list_display = (
             'name', 
-            'parent', 
             'level', 
             'get_blog_category', 
             'get_is_active', 
@@ -326,14 +329,14 @@ class CategoryAdmin(BaseAdmin):
                 'name',
                 )
             } 
-
+    inlines = (CategoryRelationshipInline,)
     fieldsets = (
             (None, {
                 'fields': (
                     'name', 
                     'slug', 
                     'show_on_list', 
-                    'parent', 
+                    #'parent', 
                     'description', 
                     'site'
                     )
@@ -355,8 +358,6 @@ class CategoryAdmin(BaseAdmin):
         return u'No de Blog'
     get_blog_category.short_description = u'categoría de blog'
     get_blog_category.allow_tags = True
-
-
 
 
 class StatusAdmin(admin.ModelAdmin):

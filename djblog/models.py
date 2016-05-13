@@ -79,15 +79,11 @@ class Category(BaseModel, CategoryModel):
     description = models.TextField(blank=True, null=True)
     show_on_list = models.BooleanField(default=False)
     objects = CategoryManager()
+    parent = models.ManyToManyField('self', symmetrical=False, through='CategoryRelationship',
+                                    null=True, blank=True, related_name='children')
 
     def __unicode__(self):
-        name = u"%s" % self.name
-        parent = self.parent
-        while parent:
-            name = u"%s -> %s" % (parent.name, name)
-            parent = parent.parent
-
-        return u"%s" % name
+        return u"%s > %s" % (self.name, self.level)
 
     @models.permalink
     def get_absolute_url(self):
@@ -104,7 +100,6 @@ class Category(BaseModel, CategoryModel):
             child = cat.get_category_childs()
             if child:
                 cc.append(child)
-
         return cc
 
     def get_root_category(self):
@@ -118,18 +113,39 @@ class Category(BaseModel, CategoryModel):
             return self
 
     def save(self, *args, **kwargs):
-        """Set up root_leve and slug"""
+        if not self.slug:
+            if hasattr(self, 'create_new_slug'):
+                self.slug = self.create_new_slug()
+            else:
+                self.slug = slugify(self.name)
+        return super(Category, self).save(*args, **kwargs)
 
-        if self.parent:
-            self.level = self.parent.level + 1
-            self.blog_category = self.parent.blog_category
+    #def save(self, *args, **kwargs):
+    #    """Set up root_leve and slug"""
 
-        super(Category, self).save(*args, **kwargs)
+    #    if self.parent.all() != 0:
+    #        self.level = self.parent.first().level + 1
+    #        self.blog_category = self.parent.first().blog_category
+
+    #    super(Category, self).save(*args, **kwargs)
  
     class Meta:
         ordering = ('level', '-pub_date', 'name', )
         verbose_name_plural = _(u"Categorías")
         verbose_name = _(u"Categoría")
+
+
+class CategoryRelationship(models.Model):
+    from_category = models.ForeignKey(Category, related_name="from_category")
+    to_category = models.ForeignKey(Category, related_name="to_category")
+
+    
+    def save(self, *args, **kwargs):
+        super(CategoryRelationship, self).save(*args,**kwargs)
+
+        if self.from_category.level != self.to_category.level + 1:
+            self.from_category.level = self.to_category.level + 1
+            self.from_category.save()
 
 
 # NEW: Ahora se puede elegir el tipo de contenido e impacta en cómo se va a 
