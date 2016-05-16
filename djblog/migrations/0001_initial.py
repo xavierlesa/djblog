@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import migrations, models
+from django.db import models, migrations
 from django.conf import settings
 
 
@@ -31,6 +31,8 @@ class Migration(migrations.Migration):
                 ('blog_category', models.BooleanField(default=True)),
                 ('description', models.TextField(null=True, blank=True)),
                 ('show_on_list', models.BooleanField(default=False)),
+                ('parent', models.ForeignKey(related_name='children', blank=True, to='djblog.Category', null=True)),
+                ('site', models.ManyToManyField(related_name='djblog_category_related', null=True, to='sites.Site', blank=True)),
             ],
             options={
                 'ordering': ('level', '-pub_date', 'name'),
@@ -39,28 +41,15 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='CategoryRelationship',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('from_category', models.ForeignKey(related_name='from_category', to='djblog.Category')),
-                ('to_category', models.ForeignKey(related_name='to_category', to='djblog.Category')),
-            ],
-        ),
-        migrations.CreateModel(
             name='ExtraContent',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('object_pk', models.PositiveIntegerField()),
                 ('key', models.SlugField(max_length=100)),
                 ('name', models.CharField(max_length=100)),
-                ('text_field', models.TextField()),
-                ('rich_field', models.BooleanField(default=False, help_text='Este estado determina si se mostrara como texto enriquecido o plano')),
-                ('sort_order', models.PositiveIntegerField(default=1, verbose_name='Orden')),
+                ('field', models.TextField()),
                 ('content_type', models.ForeignKey(to='contenttypes.ContentType')),
             ],
-            options={
-                'ordering': ('sort_order',),
-            },
         ),
         migrations.CreateModel(
             name='Post',
@@ -82,14 +71,13 @@ class Migration(migrations.Migration):
                 ('custom_template', models.TextField(null=True, verbose_name='Template HTML/Daango', blank=True)),
                 ('publication_date', models.DateTimeField(verbose_name='Fecha de publicaci\xf3n')),
                 ('expiration_date', models.DateTimeField(null=True, verbose_name='Fecha de vencimiento', blank=True)),
-                ('sort_order', models.PositiveIntegerField(default=1, verbose_name='Orden')),
                 ('allow_comments', models.NullBooleanField(default=True, verbose_name='Permitir comentarios')),
                 ('comments_finish_date', models.DateTimeField(null=True, verbose_name='Cerrar autom\xe1ticamente', blank=True)),
                 ('author', models.ForeignKey(related_name='author', blank=True, to=settings.AUTH_USER_MODEL, null=True)),
                 ('category', models.ManyToManyField(to='djblog.Category', null=True, blank=True)),
             ],
             options={
-                'ordering': ('-sort_order', '-publication_date', 'title'),
+                'ordering': ('-publication_date', 'title'),
                 'get_latest_by': 'publication_date',
                 'verbose_name': 'Post',
                 'verbose_name_plural': 'Posts',
@@ -160,7 +148,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='post',
             name='related',
-            field=models.ManyToManyField(related_name='_post_related_+', verbose_name='Contenido relacionado', to='djblog.Post', blank=True),
+            field=models.ManyToManyField(related_name='related_rel_+', verbose_name='Contenido relacionado', to='djblog.Post', blank=True),
         ),
         migrations.AddField(
             model_name='post',
@@ -181,15 +169,5 @@ class Migration(migrations.Migration):
             model_name='post',
             name='user',
             field=models.ForeignKey(blank=True, to=settings.AUTH_USER_MODEL, null=True),
-        ),
-        migrations.AddField(
-            model_name='category',
-            name='parent',
-            field=models.ManyToManyField(related_name='children', null=True, through='djblog.CategoryRelationship', to='djblog.Category', blank=True),
-        ),
-        migrations.AddField(
-            model_name='category',
-            name='site',
-            field=models.ManyToManyField(related_name='djblog_category_related', null=True, to='sites.Site', blank=True),
         ),
     ]
