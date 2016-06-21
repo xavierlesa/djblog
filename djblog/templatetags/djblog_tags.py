@@ -30,7 +30,7 @@ else:
 from markdown import markdown
 from mediacontent.models import MediaContent
 from PIL import Image, ImageOps
-from djblog.models import Post, Tag, Category
+from djblog.models import Post, Tag, Category, PostType
 
 # get title for post
 @register.simple_tag(takes_context=True)
