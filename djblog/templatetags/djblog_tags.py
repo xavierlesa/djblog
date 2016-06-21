@@ -345,6 +345,24 @@ def get_posts_from_category(cat, recursive=None):
         qs = Post.objects.get_blog_posts().filter(category__slug=cat)
     return qs.distinct()
 
+@register.assignment_tag
+def get_post_type(slug=None, id=None):
+    """
+    Retorna un post_type object por slug o ID
+    {% get_post_type [id=23|slug=blog] as post_type_object %}
+    """
+    if id:
+        try:
+            return PostType.objects.get(id=id)
+        except PostType.DoesNotExist:
+            pass
+
+    elif slug:
+        try:
+            return PostType.objects.get(slug=slug)
+        except PostType.DoesNotExist:
+            pass
+    return ''
 
 @register.assignment_tag
 def get_post_or_page(slug=None, id=None):
