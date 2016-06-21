@@ -214,6 +214,14 @@ Devuelve el ```QuerySet``` de ```post``` para una categoría.
 Si se quiere incluir las categorías ```childs``` hay que agregar el argumento ```recursive=recursive```
 
 
+### get_post_type ###
+Retorna un ```PostType``` por ```slug``` o ```ID```
+
+```
+{% get_post_type [id=23|slug=blog] as post_type_object %}
+```
+
+
 ### get_post_or_page ###
 Retorna un ```post``` o ```page``` por ```slug``` o ```ID```
 
