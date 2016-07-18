@@ -89,20 +89,25 @@ class MultiSiteBaseModel(models.Model):
 
 class BaseModel(MultiSiteBaseModel):
     """
-    BaseModel esta pensado para objectos que requieren (aunque opcionales) del uso de los meta_keywords y meta_description.
-    También ofrece una base para uso de multi-lenguajes, multi-sitios, auto slug, fecha de publicación y los campos de 
-    -invisibilidad- y activo/inactivo, éste definitivamente es un buen cominezo para los futuros modelos.
+    BaseModel esta pensado para objectos que requieren (aunque opcionales) del
+    uso de los seo_keywords y seo_description. También ofrece una base para 
+    uso de multi-lenguajes, multi-sitios, auto slug, fecha de publicación y los
+    campos de -invisibilidad- y activo/inactivo, éste definitivamente es un 
+    buen cominezo para los futuros modelos.
     """
     pub_date = models.DateTimeField(blank=True, verbose_name=_(u"Fecha de creación"))
     up_date = models.DateTimeField(auto_now=True, verbose_name=_(u"Fecha de actualización"))
 
     slug = models.SlugField(max_length=250)
     
-    is_active = models.BooleanField(default=True, verbose_name=_(u"Es activo"), help_text=_(u"activa para usar en el frontend"))
-    is_live = models.BooleanField(default=True, verbose_name=_(u"Es visible"), help_text=_(u"NO activo lo hace -invisible-")) 
-       
-    meta_keywords = models.TextField(blank=True, help_text=_(u"opcional, para el SEO"))
-    meta_description = models.TextField(blank=True, help_text=_(u"opcional, para el SEO"))
+    is_active = models.BooleanField(default=True, verbose_name=_(u"Es activo"),
+                                    help_text=_(u"activa para usar en el frontend"))
+    is_live = models.BooleanField(default=True, verbose_name=_(u"Es visible"), 
+                                  help_text=_(u"NO activo lo hace -invisible-")) 
+
+    seo_title = models.CharField(blank=True, max_length=70, help_text=_(u"opcional, para el SEO"))   
+    seo_description = models.TextField(blank=True, max_length=160, help_text=_(u"opcional, para el SEO"))
+    seo_keywords = models.TextField(blank=True, max_length=160, help_text=_(u"opcional, para el SEO"))
 
     objects = BaseManager()
     multisite_unique_together = ('slug',)

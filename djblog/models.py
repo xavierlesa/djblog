@@ -265,8 +265,8 @@ class Post(CustomTemplate, BaseModel, ContentModel):
         #if not self.content:
         #    self.content = self.content_rendered
         # auto-genera los meta
-        if not self.meta_description or self.meta_description != self.content.replace('"',''):
-            self.meta_description = self.content.replace('"','')
+        if not self.seo_description or self.seo_description != self.content.replace('"',''):
+            self.seo_description = self.content.replace('"','')
 
         if not self.pub_date:
             self.pub_date = tz_now()
