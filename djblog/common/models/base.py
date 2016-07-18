@@ -120,8 +120,9 @@ class BaseModel(MultiSiteBaseModel):
     is_live = models.BooleanField(default=True, verbose_name=_(u"Es visible"),
                                   help_text=_(u"NO activo lo hace -invisible-")) 
        
-    meta_keywords = models.TextField(blank=True, help_text=_(u"opcional, para el SEO"))
-    meta_description = models.TextField(blank=True, help_text=_(u"opcional, para el SEO"))
+    seo_title = models.CharField(blank=True, max_length=70, help_text=_(u"opcional, para el SEO"))   
+    seo_description = models.TextField(blank=True, max_length=160, help_text=_(u"opcional, para el SEO"))
+    seo_keywords = models.TextField(blank=True, max_length=160, help_text=_(u"opcional, para el SEO"))
 
     objects = BaseManager()
     multisite_unique_together = ('slug',)

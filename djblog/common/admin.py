@@ -86,8 +86,9 @@ class BaseAdmin(MultiSiteBaseAdmin):
     fieldsets = (
             ('Seo Meta config.', {
                 'fields': (
-                    'meta_keywords', 
-                    'meta_description',
+                    'seo_title',
+                    'seo_description',
+                    'seo_keywords',
                     ),
                 'classes': (
                     'collapse',
