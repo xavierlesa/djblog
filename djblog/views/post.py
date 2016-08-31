@@ -400,7 +400,7 @@ class GenericPostDetailView(PostBase, DetailView):
     def get_object(self):
         post_type_slug = self.kwargs.get('post_type_slug', '')
         slug = self.kwargs.get('slug', '')
-        return self.get_queryset().get(post_type__post_type_slug=post_type_slug, slug=slug)
+        return get_object_or_404(self.get_queryset(), post_type__post_type_slug=post_type_slug, slug=slug)
 
     def get_template_names(self):
         names = super(GenericPostDetailView, self).get_template_names()
